@@ -2,7 +2,7 @@
   "name": "Nakawe — Asistente de Salud",
   "short_name": "Nakawe",
   "description": "Asistente de salud digital con LUZ — ExpoCiencias 2026",
-  "start_url": "nakawe-ip15-v3.html",
+  "start_url": "index.html",
   "scope": ".",
   "display": "standalone",
   "orientation": "portrait",
@@ -11,12 +11,12 @@
   "categories": ["health", "medical"],
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "assets/images/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icon-512.png",
+      "src": "assets/images/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

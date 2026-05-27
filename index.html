@@ -13,7 +13,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Nakawe" />
-  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="apple-touch-icon" href="assets/images/apple-touch-icon.png" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <link rel="manifest" href="manifest.json" />
   <title>Nakawe</title>
   <style>
@@ -202,6 +203,7 @@
       flex-direction: column;
       position: relative;
       overflow: hidden;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
       transition: background 0.4s, color 0.4s;
     }
 
@@ -651,6 +653,34 @@
     .haptic-indicator.show { opacity: 1; }
 
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+    .install-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 20px;
+      background: var(--accent);
+      color: #fff;
+      font-size: calc(14px * var(--font-scale));
+      font-weight: 500;
+      flex-shrink: 0;
+      animation: slideUp 0.35s ease-out both;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .install-banner button {
+      flex-shrink: 0;
+      padding: 8px 20px;
+      background: #fff;
+      color: var(--accent);
+      border: 0;
+      border-radius: var(--radius-pill);
+      font: inherit;
+      font-size: calc(14px * var(--font-scale));
+      font-weight: 600;
+      cursor: pointer;
+    }
+
     @media (min-width: 481px) {
       body {
         background: radial-gradient(60% 80% at 50% 0%, color-mix(in oklch, var(--accent) 8%, #1a1a1c) 0%, #0e0e10 60%);
@@ -673,7 +703,7 @@
     <main class="content" data-od-id="content">
           <section class="screen-view active" id="screen-login" data-od-id="login">
             <div class="select-header slide-up">
-              <img class="logo" src="./nakawe-logo.jpeg" alt="Nakawe">
+              <img class="logo" src="./assets/images/nakawe-logo.jpeg" alt="Nakawe">
               <h1>Nakawe</h1>
               <p>Elige quién quiere hablar con LUZ</p>
               <span class="expo-badge">✦ ExpoCiencias 2026</span>
@@ -729,7 +759,7 @@
             <div class="luz-zone" data-od-id="luz-zone">
               <div class="luz-header">
                 <span class="title">
-                  <span class="luz-icon"><img class="luz-img" src="./luz.png" alt="LUZ"></span>
+                  <span class="luz-icon"><img class="luz-img" src="./assets/images/luz.png" alt="LUZ"></span>
                   LUZ · Asistente
                 </span>
                 <div class="controls">
@@ -750,14 +780,14 @@
               <div class="chat-area" id="chatArea" data-od-id="chat">
                 <div class="bubble luz">
                   <div class="bubble-header">
-                    <span class="luz-mini"><img class="luz-img" src="./luz.png" alt="LUZ"></span>
+                    <span class="luz-mini"><img class="luz-img" src="./assets/images/luz.png" alt="LUZ"></span>
                     <span class="luz-label">LUZ</span>
                   </div>
                   Hola, soy LUZ. Pulsa el micrófono y dime cómo te sientes, o escribe tu consulta.
                 </div>
                 <div class="bubble luz">
                   <div class="bubble-header">
-                    <span class="luz-mini"><img class="luz-img" src="./luz.png" alt="LUZ"></span>
+                    <span class="luz-mini"><img class="luz-img" src="./assets/images/luz.png" alt="LUZ"></span>
                     <span class="luz-label">LUZ</span>
                   </div>
                   También puedo recordarte tus medicamentos, darte indicaciones, o conectarte con tu médico.
@@ -782,7 +812,7 @@
               </div>
               <div class="voice-orbit">
                 <div class="orb">
-                  <span class="orb-logo"><img class="luz-img" src="./luz.png" alt="LUZ"></span>
+                  <span class="orb-logo"><img class="luz-img" src="./assets/images/luz.png" alt="LUZ"></span>
                   <span class="orb-wave"></span><span class="orb-wave"></span><span class="orb-wave"></span>
                 </div>
                 <span class="orb-label" id="orbLabel">Escuchando…</span>
@@ -906,6 +936,10 @@
             <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg> Perfil
           </div>
         </nav>
+    <div class="install-banner" id="installBanner" onclick="window.installApp()">
+      <span>📲 Instalar Nakawe en tu pantalla</span>
+      <button>Instalar</button>
+    </div>
   </div>
   <div class="haptic-indicator" id="hapticIndicator">Vibración</div>
 
@@ -1036,7 +1070,7 @@
       addChat(role,text) {
         const c = document.getElementById('chatArea'), b = document.createElement('div');
         b.className = 'bubble '+role;
-        if(role==='luz') b.innerHTML='<div class="bubble-header"><span class="luz-mini"><img class="luz-img" src="./luz.png" alt="LUZ"></span><span class="luz-label">LUZ</span></div>'+this.escapeHtml(text);
+        if(role==='luz') b.innerHTML='<div class="bubble-header"><span class="luz-mini"><img class="luz-img" src="./assets/images/luz.png" alt="LUZ"></span><span class="luz-label">LUZ</span></div>'+this.escapeHtml(text);
         else b.textContent=text;
         c.appendChild(b); this.scrollChat();
       },
@@ -1069,7 +1103,7 @@
       },
       setHighContrastMode(m) {
         this.hcMode=m;
-        const scr = document.querySelector('.screen');
+        const scr = document.getElementById('app');
         scr.classList.remove('hc-mode-1','hc-mode-2','hc-mode-3','hc-mode-4');
         scr.classList.add('hc-mode-'+m);
         document.querySelectorAll('.hc-mode-chip').forEach(c=>c.classList.toggle('active',parseInt(c.dataset.hcMode)===m));
@@ -1087,6 +1121,23 @@
 });
 </script>
 <script>
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const banner = document.getElementById('installBanner');
+    if (banner) banner.style.display = 'flex';
+  });
+  window.addEventListener('appinstalled', () => {
+    deferredPrompt = null;
+    const banner = document.getElementById('installBanner');
+    if (banner) banner.style.display = 'none';
+  });
+  window.installApp = function() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+  };
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }

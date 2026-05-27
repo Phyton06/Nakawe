@@ -1,15 +1,15 @@
 /* Nakawe Service Worker — ExpoCiencias 2026 */
 
-const CACHE = 'nakawe-v1';
+const CACHE = 'nakawe-v2';
 const ASSETS = [
-  'nakawe-ip15-v3.html',
+  'index.html',
   'manifest.json',
-  'logo.png',
-  'luz.png',
-  'nakawe-logo.jpeg',
-  'icon-192.png',
-  'icon-512.png',
-  'apple-touch-icon.png'
+  'assets/images/logo.png',
+  'assets/images/luz.png',
+  'assets/images/nakawe-logo.jpeg',
+  'assets/images/icon-192.png',
+  'assets/images/icon-512.png',
+  'assets/images/apple-touch-icon.png'
 ];
 
 self.addEventListener('install', event => {
