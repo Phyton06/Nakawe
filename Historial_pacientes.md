@@ -51,12 +51,12 @@
 - ❗ Cirugía de catarata pendiente — hija no podrá acompañarla
 
 ### Preguntas Sugeridas para Asistentes
-1. ¿Qué medicamentos toma María?
-2. ¿Por qué suspendió el Losartán?
-3. ¿Cómo está su diabetes?
-4. ¿Cuándo es su cirugía de catarata?
-5. ¿Qué síntomas tiene en los pies?
-6. ¿Vive sola o acompañada?
+1. ¿Qué medicamentos debo tomar?
+2. Me siento mareada, ¿debo dejar el Losartán?
+3. ¿Cómo está mi diabetes?
+4. ¿Cuándo es mi cirugía de la vista?
+5. Me hormiguean los pies, ¿qué puede ser?
+6. Vivo sola, ¿qué hago si me siento mal?
 
 ---
 
@@ -107,12 +107,12 @@
 - ❗ Asiste irregularmente a rehabilitación cardíaca
 
 ### Preguntas Sugeridas para Asistentes
-1. ¿Qué problema del corazón tiene Pedro?
-2. ¿Qué medicamentos toma para el corazón?
-3. ¿Por qué le preocupa tanto su salud?
-4. ¿Qué otros problemas de salud tiene además del corazón?
-5. ¿Tiene algún síntoma actualmente?
-6. ¿Por qué dejó de fumar?
+1. ¿Me va a dar otro infarto?
+2. Sentí un dolor en el pecho anoche, ¿qué hago?
+3. ¿Para qué son mis medicamentos?
+4. ¿Por qué tengo la glucosa alta?
+5. Me falta el aire al subir escaleras, ¿es normal?
+6. ¿Puedo tomar cerveza los domingos?
 
 ---
 
@@ -162,12 +162,12 @@
 - ❗ Siente que es "una carga" para su hija
 
 ### Preguntas Sugeridas para Asistentes
-1. ¿Qué cirugía le hicieron a Carmen?
-2. ¿Por qué suspendió el antibiótico?
-3. ¿Cómo va su recuperación?
-4. ¿Qué medicamentos toma para los huesos?
-5. ¿Por qué es importante su caso de osteoporosis?
-6. ¿Cómo se siente emocionalmente?
+1. ¿Cuándo voy a caminar bien sin bastón?
+2. El antibiótico me cayó pesado, ¿lo dejo?
+3. Me duele la cadera, ¿es normal después de la operación?
+4. No puedo dormir por el dolor, ¿qué hago?
+5. ¿Qué medicamentos tomo para los huesos?
+6. ¿Por qué mi mamá murió de lo mismo que tengo?
 
 ---
 
@@ -215,12 +215,12 @@ Ninguna
 - ❗ Hipocondría digital — puede generar ansiedad innecesaria
 
 ### Preguntas Sugeridas para Asistentes
-1. ¿Por qué José está preocupado por su salud?
-2. ¿Qué le detectaron en sus estudios?
-3. ¿Tiene algún tratamiento médico?
-4. ¿Por qué usa un CPAP?
-5. ¿Qué es la "hipocondría digital"?
-6. ¿Cuál es su mayor miedo respecto a su salud?
+1. ¿Qué me salió en los estudios?
+2. ¿Necesito medicinas para el colesterol?
+3. El CPAP me molesta, ¿es necesario todas las noches?
+4. Mi papá murió del corazón a mi edad, ¿corro peligro?
+5. ¿Puedo empezar a hacer ejercicio?
+6. Investigué en internet y estoy preocupado, ¿qué me recomienda?
 
 ---
 
