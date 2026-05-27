@@ -1433,21 +1433,38 @@ ${alertStr ? '\nALERTAS:\n' + alertStr : ''}`;
             if (!this.voiceModeActive) { done = true; clearTimeout(timeout); return; }
             const part = data.candidates?.[0]?.content?.parts?.[0];
             if (part?.inlineData?.data) {
-              const pcmBytes = this.base64ToBytes(part.inlineData.data);
-              const wav = this.pcmToWav(pcmBytes, 24000);
+              console.log(`TTS [${model}]: inlineData recibido (${part.inlineData.data.length} chars)`);
+              let pcmBytes, wav;
+              try {
+                pcmBytes = this.base64ToBytes(part.inlineData.data);
+                console.log(`TTS [${model}]: base64 decodificado (${pcmBytes.length} bytes)`);
+                wav = this.pcmToWav(pcmBytes, 24000);
+                console.log(`TTS [${model}]: WAV generado (${wav.byteLength} bytes)`);
+              } catch (convErr) {
+                console.warn(`TTS [${model}]: error en conversion:`, convErr);
+                throw convErr;
+              }
               const blob = new Blob([wav], { type: 'audio/wav' });
               clearTimeout(timeout);
               done = true;
               this.showAudioIndicator(false);
               if (this.currentAudio) { this.currentAudio.pause(); this.currentAudio = null; }
               this.currentAudio = new Audio(URL.createObjectURL(blob));
-              this.currentAudio.play().catch(() => {
-                // Autoplay bloqueado — igual reabrimos el mic
+              this.currentAudio.play()
+                .then(() => console.log(`TTS [${model}]: reproduciendo audio`))
+                .catch((err) => {
+                  console.warn(`TTS [${model}]: autoplay bloqueado (${err.message}), cayendo a SpeechSynthesis`);
+                  this.currentAudio = null;
+                  this.fallbackSpeak(text);
+                });
+              this.currentAudio.onended = () => {
+                console.log(`TTS [${model}]: audio terminado`);
                 this.autoRestartListening();
-              });
-              this.currentAudio.onended = () => this.autoRestartListening();
+              };
               const t2 = performance.now();
               console.log(`TTS [${model}]: audio listo en ${(t2-t0).toFixed(0)}ms`);
+            } else {
+              console.warn(`TTS [${model}]: respuesta sin inlineData, parts:`, part ? Object.keys(part).join(',') : 'undefined');
             }
           } catch (err) {
             console.warn(`${model} error:`, err);
