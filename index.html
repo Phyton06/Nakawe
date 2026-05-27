@@ -1115,8 +1115,13 @@
       autoRestartListening() {
         this.waitingForLuz = false;
         if (this.voiceModeActive && !this.micListening) {
-          document.getElementById('orbLabel').textContent = 'Escuchando…';
-          this.startListening();
+          // Pausa breve para que no se encadenen requests sin respiro
+          setTimeout(() => {
+            if (this.voiceModeActive && !this.micListening) {
+              document.getElementById('orbLabel').textContent = 'Escuchando…';
+              this.startListening();
+            }
+          }, 1500);
         }
       },
 
@@ -1277,7 +1282,8 @@ ${sintStr ? '\nSÍNTOMAS REPORTADOS:\n' + sintStr : ''}
 ${alertStr ? '\nALERTAS:\n' + alertStr : ''}`;
       },
 
-      async queryGemini(text) {
+      async queryGemini(text, retryCount) {
+        if (retryCount === undefined) retryCount = 0;
         if (!GEMINI_API_KEY || GEMINI_API_KEY === 'tu-api-key-de-gemini') {
           const fallback = 'Uy, parece que necesito que me activen primero. Dile al equipo de Nakawe que configuren mi API key y al instante estoy lista.';
           this.addChat('luz', fallback);
@@ -1299,7 +1305,7 @@ ${alertStr ? '\nALERTAS:\n' + alertStr : ''}`;
 
         try {
           const res = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
             {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -1315,6 +1321,14 @@ ${alertStr ? '\nALERTAS:\n' + alertStr : ''}`;
           );
 
           if (!res.ok) {
+            if (res.status === 429 && retryCount < 3) {
+              // Rate limited — esperamos y reintentamos con backoff
+              const wait = 2000 * Math.pow(2, retryCount);
+              console.warn(`429 rate limit, reintento ${retryCount + 1}/3 en ${wait}ms`);
+              this.setCaption('LUZ', 'Un momento, estoy procesando…', false);
+              await new Promise(r => setTimeout(r, wait));
+              return this.queryGemini(text, retryCount + 1);
+            }
             throw new Error(`API error: ${res.status}`);
           }
 
@@ -1333,9 +1347,19 @@ ${alertStr ? '\nALERTAS:\n' + alertStr : ''}`;
 
         } catch (err) {
           console.error('Gemini error:', err);
-          const errorMsg = 'Disculpa, tuve un problema para responder. ¿Puedes intentar de nuevo?';
+          const isRateLimit = err.message?.includes('429');
+          const errorMsg = isRateLimit
+            ? 'Hablamos muy rápido, dame un segundo para retomar.'
+            : 'Disculpa, tuve un problema para responder. ¿Podés intentar de nuevo?';
           this.addChat('luz', errorMsg);
           this.setCaption('LUZ', errorMsg, true);
+          if (isRateLimit) {
+            // Backoff extra para no encadenar 429s
+            const cooldown = 4000;
+            this.setCaption('LUZ', 'Dame un segundo…', false);
+            document.getElementById('orbLabel').textContent = 'Recuperando…';
+            await new Promise(r => setTimeout(r, cooldown));
+          }
           if(!this.muted) this.fallbackSpeak(errorMsg);
           else this.autoRestartListening();
         }
