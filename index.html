@@ -956,7 +956,7 @@
   <script>
 
     const nakawe = {
-      currentScreen:'login', activePatient:null, micListening:false, voiceModeActive:false,
+      currentScreen:'login', activePatient:null, micListening:false, voiceModeActive:false, waitingForLuz:false,
       recognition:null, synth:window.speechSynthesis, muted:false, hapticOn:true, currentAudio:null,
       voices:[], spanishVoices:[], selectedVoice:null, voiceReady:false,
       scenario:'clinic', fontScale:1, highContrast:false, hcMode:null, daltonism:false,
@@ -1025,37 +1025,125 @@
         if(this.hapticOn) this.triggerHaptic();
       },
 
-      toggleMic() { this.micListening ? this.stopListening() : this.startListening(); },
+      toggleMic() {
+        // Mic button: inicia o finaliza la "llamada" de voz continua
+        if (this.voiceModeActive) {
+          this.endVoiceMode();
+        } else {
+          this.enterVoiceMode();
+          this.startListening();
+        }
+      },
 
       startListening() {
-        const btn = document.getElementById('micBtn');
-        this.micListening=true; btn.classList.add('listening'); btn.classList.remove('idle-pulse');
-        this.enterVoiceMode();
+        this.micListening = true;
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
           const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-          this.recognition = new SR(); this.recognition.lang='es-MX'; this.recognition.continuous=false; this.recognition.interimResults=true;
+          this.recognition = new SR();
+          this.recognition.lang = 'es-MX';
+          this.recognition.continuous = false;
+          this.recognition.interimResults = true;
           this.recognition.onresult = (e) => {
-            let t=''; for(let i=e.resultIndex;i<e.results.length;i++){ t+=e.results[i][0].transcript; if(e.results[i].isFinal){ this.addChat('user',t); this.queryGemini(t); this.setCaption('Tú',t,true); this.stopListening(); return; } }
-            if(t) this.setCaption('Tú',t+'…',false);
+            let t = '';
+            for (let i = e.resultIndex; i < e.results.length; i++) {
+              t += e.results[i][0].transcript;
+              if (e.results[i].isFinal) {
+                this.addChat('user', t);
+                this.waitingForLuz = true;
+                this.setCaption('Tú', t, true);
+                this.queryGemini(t);
+                this.stopListening();
+                return;
+              }
+            }
+            if (t) this.setCaption('Tú', t + '…', false);
           };
-          this.recognition.onerror = () => { this.addChat('luz','No te escuché bien. ¿Puedes repetirlo?'); this.setCaption('LUZ','No te escuché bien. ¿Puedes repetirlo?',true); this.stopListening(); };
-          this.recognition.start();
+          this.recognition.onerror = (ev) => {
+            // Errores por nuestra propia parada los ignoramos
+            if (ev.error === 'aborted' || ev.error === 'canceled') return;
+            console.warn('SpeechRecognition error:', ev.error);
+            this.recognition = null;
+            this.micListening = false;
+            if (ev.error === 'not-allowed') {
+              this.setCaption('LUZ', 'Necesito acceso al micrófono para escucharte.', true);
+              this.endVoiceMode();
+            } else if (ev.error === 'no-speech') {
+              if (this.voiceModeActive) {
+                this.setCaption('LUZ', 'No te escuché. Habla cuando estés listo.', false);
+                setTimeout(() => {
+                  if (this.voiceModeActive && !this.micListening) this.startListening();
+                }, 500);
+              }
+            } else {
+              this.setCaption('LUZ', 'No te escuché bien. ¿Podés repetirlo?', true);
+              if (this.voiceModeActive) {
+                setTimeout(() => {
+                  if (this.voiceModeActive && !this.micListening) this.startListening();
+                }, 800);
+              }
+            }
+          };
+          try {
+            this.recognition.start();
+          } catch (e) {
+            console.warn('recognition.start() falló:', e);
+            this.setCaption('LUZ', 'No pude activar el micrófono. Probá de nuevo.', true);
+            this.endVoiceMode();
+          }
         } else {
-          this.setCaption('LUZ','Escuchando…',false);
-          setTimeout(()=>{ const m='Me duele un poco la cabeza'; this.setCaption('Tú',m,true); this.addChat('user',m); this.queryGemini(m); this.stopListening(); },2000);
+          // Fallback — navegador sin SpeechRecognition
+          this.setCaption('LUZ', 'Escuchando…', false);
+          setTimeout(() => {
+            const m = 'Me duele un poco la cabeza';
+            this.setCaption('Tú', m, true);
+            this.addChat('user', m);
+            this.waitingForLuz = true;
+            this.queryGemini(m);
+            this.stopListening();
+          }, 2000);
         }
       },
 
       stopListening() {
-        const btn = document.getElementById('micBtn');
-        this.micListening=false; btn.classList.remove('listening'); btn.classList.add('idle-pulse');
-        if(this.recognition){ try{this.recognition.stop()}catch(e){} this.recognition=null; }
-        if(this.voiceModeActive) setTimeout(()=>{ if(!this.micListening) this.exitVoiceMode(); },2500);
+        this.micListening = false;
+        if (this.recognition) {
+          try { this.recognition.stop(); } catch (e) {}
+          this.recognition = null;
+        }
       },
 
-      enterVoiceMode() { this.voiceModeActive=true; document.getElementById('voiceOverlay').classList.add('active'); document.getElementById('orbLabel').textContent='Escuchando…'; },
-      exitVoiceMode() { this.voiceModeActive=false; document.getElementById('voiceOverlay').classList.remove('active'); },
-      endVoiceMode() { this.stopListening(); this.exitVoiceMode(); },
+      autoRestartListening() {
+        this.waitingForLuz = false;
+        if (this.voiceModeActive && !this.micListening) {
+          document.getElementById('orbLabel').textContent = 'Escuchando…';
+          this.startListening();
+        }
+      },
+
+      enterVoiceMode() {
+        this.voiceModeActive = true;
+        const btn = document.getElementById('micBtn');
+        btn.classList.add('listening');
+        btn.classList.remove('idle-pulse');
+        btn.setAttribute('aria-label', 'Finalizar llamada');
+        document.getElementById('voiceOverlay').classList.add('active');
+        document.getElementById('orbLabel').textContent = 'Escuchando…';
+      },
+      exitVoiceMode() {
+        this.voiceModeActive = false;
+        const btn = document.getElementById('micBtn');
+        btn.classList.remove('listening');
+        btn.classList.add('idle-pulse');
+        btn.setAttribute('aria-label', 'Activar micrófono');
+        document.getElementById('voiceOverlay').classList.remove('active');
+      },
+      endVoiceMode() {
+        if (this.currentAudio) { this.currentAudio.pause(); this.currentAudio = null; }
+        if (this.synth) this.synth.cancel();
+        this.stopListening();
+        this.exitVoiceMode();
+        this.waitingForLuz = false;
+      },
 
       setCaption(sp,tx,isFinal) {
         document.getElementById('captionText').innerHTML = '<span class="voice-label">'+sp+'</span>'+this.escapeHtml(tx);
@@ -1195,6 +1283,7 @@ ${alertStr ? '\nALERTAS:\n' + alertStr : ''}`;
           this.addChat('luz', fallback);
           this.setCaption('LUZ', fallback, true);
           if(!this.muted) this.fallbackSpeak(fallback);
+          else this.autoRestartListening();
           return;
         }
 
@@ -1219,7 +1308,7 @@ ${alertStr ? '\nALERTAS:\n' + alertStr : ''}`;
                 contents,
                 generationConfig: {
                   temperature: 0.7,
-                  maxOutputTokens: 500
+                  maxOutputTokens: 1024
                 }
               })
             }
@@ -1239,6 +1328,7 @@ ${alertStr ? '\nALERTAS:\n' + alertStr : ''}`;
           this.addChat('luz', reply);
           this.setCaption('LUZ', reply, true);
           if(!this.muted) this.generateSpeech(reply);
+          else this.autoRestartListening();
           if(this.hapticOn) this.triggerHaptic();
 
         } catch (err) {
@@ -1247,6 +1337,7 @@ ${alertStr ? '\nALERTAS:\n' + alertStr : ''}`;
           this.addChat('luz', errorMsg);
           this.setCaption('LUZ', errorMsg, true);
           if(!this.muted) this.fallbackSpeak(errorMsg);
+          else this.autoRestartListening();
         }
       },
 
@@ -1310,6 +1401,8 @@ ${alertStr ? '\nALERTAS:\n' + alertStr : ''}`;
             const data = await res.json();
             const t1 = performance.now();
             console.log(`TTS [${model}]: respuesta en ${(t1-t0).toFixed(0)}ms`);
+            // Si colgaron mientras se generaba, no reproducimos
+            if (!this.voiceModeActive) { done = true; clearTimeout(timeout); return; }
             const part = data.candidates?.[0]?.content?.parts?.[0];
             if (part?.inlineData?.data) {
               const pcmBytes = this.base64ToBytes(part.inlineData.data);
@@ -1320,7 +1413,11 @@ ${alertStr ? '\nALERTAS:\n' + alertStr : ''}`;
               this.showAudioIndicator(false);
               if (this.currentAudio) { this.currentAudio.pause(); this.currentAudio = null; }
               this.currentAudio = new Audio(URL.createObjectURL(blob));
-              this.currentAudio.play();
+              this.currentAudio.play().catch(() => {
+                // Autoplay bloqueado — igual reabrimos el mic
+                this.autoRestartListening();
+              });
+              this.currentAudio.onended = () => this.autoRestartListening();
               const t2 = performance.now();
               console.log(`TTS [${model}]: audio listo en ${(t2-t0).toFixed(0)}ms`);
             }
@@ -1346,7 +1443,10 @@ ${alertStr ? '\nALERTAS:\n' + alertStr : ''}`;
         }
       },
       fallbackSpeak(text) {
-        if (!this.synth || this.muted) return;
+        if (!this.synth || this.muted) {
+          this.autoRestartListening();
+          return;
+        }
         this.synth.cancel();
         const u = new SpeechSynthesisUtterance(text);
         if (this.selectedVoice) {
@@ -1356,6 +1456,7 @@ ${alertStr ? '\nALERTAS:\n' + alertStr : ''}`;
           u.lang = 'es-MX';
         }
         u.rate = 0.85;
+        u.onend = () => this.autoRestartListening();
         this.synth.speak(u);
       },
       // PCM raw (s16le) → WAV con header, para que el browser lo reproduzca
