@@ -1,0 +1,751 @@
+<!doctype html>
+<!--
+  Nakawe — Dashboard de Triage (Enfermería, Desktop)
+  Quick patient search, vital signs capture, priority classification.
+  Same warm clinical palette as patient PWA + doctor dashboard.
+  ExpoCiencias 2026 demo.
+-->
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nakawe · Triage Enfermería</title>
+  <style>
+    :root {
+      --bg:      oklch(97% 0.018 70);
+      --surface: oklch(99% 0.008 70);
+      --fg:      oklch(22% 0.02 50);
+      --muted:   oklch(30% 0.018 50);
+      --border:  oklch(90% 0.014 70);
+      --accent:  oklch(38% 0.17 160);
+      --accent-soft:  color-mix(in oklch, var(--accent) 18%, transparent);
+      --accent-warm:  oklch(62% 0.12 85);
+      --accent-warm-soft: color-mix(in oklch, var(--accent-warm) 18%, transparent);
+      --danger:  oklch(45% 0.24 30);
+      --danger-soft: color-mix(in oklch, var(--danger) 14%, transparent);
+      --warning: oklch(60% 0.24 85);
+      --warning-soft: color-mix(in oklch, var(--warning) 14%, transparent);
+      --safe:    oklch(45% 0.22 145);
+      --safe-soft: color-mix(in oklch, var(--safe) 14%, transparent);
+      --fg-soft: color-mix(in oklch, var(--fg) 6%, transparent);
+
+      --font-display: 'Iowan Old Style', 'Charter', Georgia, serif;
+      --font-body:  -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+      --font-mono:  ui-monospace, 'SF Mono', Menlo, monospace;
+
+      --fs-xs:   11px;
+      --fs-sm:   13px;
+      --fs-body: 14px;
+      --fs-md:   15px;
+      --fs-lg:   18px;
+      --fs-xl:   22px;
+      --fs-2xl:  28px;
+
+      --radius: 12px;
+      --radius-sm: 8px;
+      --radius-pill: 999px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-size: var(--fs-body);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .header {
+      position: sticky; top: 0; z-index: 20;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 28px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .header-logo { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+    .header-title h1 { font-size: var(--fs-lg); font-weight: 600; letter-spacing: -0.01em; }
+    .header-title .sub { color: var(--muted); font-size: var(--fs-sm); margin-top: 1px; font-family: var(--font-mono); letter-spacing: 0.04em; text-transform: uppercase; }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .header-clock { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--muted); font-variant-numeric: tabular-nums; }
+    .header-nss { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--muted); letter-spacing: 0.04em; }
+
+    .layout {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 24px 28px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .card-header h2 {
+      font-family: var(--font-display); font-size: var(--fs-lg);
+      letter-spacing: -0.01em; font-weight: 600; margin: 0;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .card-header h2 .icon { width: 22px; height: 22px; stroke: var(--accent); fill: none; stroke-width: 1.7; flex-shrink: 0; }
+
+    .section-title {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted); margin: 0 0 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .section-title svg { width: 14px; height: 14px; stroke: var(--muted); fill: none; stroke-width: 1.7; flex-shrink: 0; }
+
+    .search-area { position: relative; }
+    .search-input {
+      width: 100%; padding: 14px 18px 14px 48px;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      font: inherit; font-size: var(--fs-md); color: var(--fg);
+      background: var(--bg); transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .search-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+    .search-input::placeholder { color: var(--muted); opacity: 0.6; }
+    .search-icon {
+      position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+      width: 20px; height: 20px; stroke: var(--muted); fill: none; stroke-width: 1.7;
+      pointer-events: none;
+    }
+    .search-clear {
+      display: none; position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      width: 24px; height: 24px; border-radius: 50%; border: 0;
+      background: transparent; color: var(--muted); cursor: pointer;
+      font-size: 16px; line-height: 1; place-items: center;
+    }
+    .search-clear.visible { display: grid; }
+    .search-clear:hover { color: var(--fg); background: var(--fg-soft); }
+
+    .search-dropdown {
+      display: none;
+      position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+      overflow: hidden; z-index: 30;
+    }
+    .search-dropdown.visible { display: block; }
+    .search-dropdown .sd-option {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; cursor: pointer;
+      transition: background 0.12s; border-bottom: 1px solid var(--border);
+    }
+    .search-dropdown .sd-option:last-child { border-bottom: 0; }
+    .search-dropdown .sd-option:hover { background: var(--fg-soft); }
+    .search-dropdown .sd-option .sd-avatar {
+      width: 36px; height: 36px; border-radius: 50%; color: #fff;
+      display: grid; place-items: center;
+      font-family: var(--font-display); font-size: 15px; font-weight: 600; flex-shrink: 0;
+    }
+    .search-dropdown .sd-option .sd-info { flex: 1; min-width: 0; }
+    .search-dropdown .sd-option .sd-info .sd-name { font-size: var(--fs-md); font-weight: 600; }
+    .search-dropdown .sd-option .sd-info .sd-detail { color: var(--muted); font-size: var(--fs-sm); font-family: var(--font-mono); letter-spacing: 0.03em; margin-top: 1px; }
+    .search-dropdown .sd-option .sd-age { color: var(--muted); font-size: var(--fs-sm); white-space: nowrap; }
+    .search-dropdown .sd-empty {
+      padding: 24px 16px; text-align: center; color: var(--muted);
+      font-size: var(--fs-sm); display: flex; flex-direction: column; align-items: center; gap: 8px;
+    }
+    .search-dropdown .sd-empty svg { width: 28px; height: 28px; stroke: var(--muted); fill: none; stroke-width: 1.5; }
+
+    .empty-state, .error-state {
+      display: none;
+      flex-direction: column; align-items: center; gap: 10px;
+      padding: 32px 20px; text-align: center;
+    }
+    .empty-state.visible, .error-state.visible { display: flex; }
+    .empty-state .es-icon, .error-state .es-icon {
+      width: 48px; height: 48px; border-radius: 50%;
+      display: grid; place-items: center;
+    }
+    .empty-state .es-icon { background: var(--fg-soft); }
+    .error-state .es-icon { background: var(--danger-soft); }
+    .empty-state .es-icon svg, .error-state .es-icon svg { width: 24px; height: 24px; stroke: var(--muted); fill: none; stroke-width: 1.7; }
+    .error-state .es-icon svg { stroke: var(--danger); }
+    .empty-state .es-title, .error-state .es-title { font-size: var(--fs-md); font-weight: 500; }
+    .error-state .es-title { color: var(--danger); }
+    .empty-state .es-sub, .error-state .es-sub { color: var(--muted); font-size: var(--fs-sm); max-width: 300px; line-height: 1.5; }
+
+    .patient-card {
+      display: none;
+      align-items: center; gap: 16px;
+      padding: 16px 20px;
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      background: var(--accent-soft);
+    }
+    .patient-card.visible { display: flex; }
+    .patient-card .pc-avatar {
+      width: 52px; height: 52px; border-radius: 50%;
+      color: #fff; display: grid; place-items: center;
+      font-family: var(--font-display); font-size: 22px; font-weight: 600; flex-shrink: 0;
+    }
+    .patient-card .pc-info { flex: 1; min-width: 0; }
+    .patient-card .pc-info .pc-name { font-size: var(--fs-lg); font-weight: 600; letter-spacing: -0.01em; }
+    .patient-card .pc-info .pc-detail { color: var(--muted); font-size: var(--fs-sm); margin-top: 3px; font-family: var(--font-mono); letter-spacing: 0.03em; }
+    .patient-card .pc-check {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--safe); color: #fff;
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+    .patient-card .pc-check svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+    .vitals-grid {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
+    }
+    .vital-field { display: flex; flex-direction: column; gap: 4px; }
+    .vital-field label {
+      font-size: var(--fs-xs); color: var(--muted); font-family: var(--font-mono);
+      letter-spacing: 0.04em; text-transform: uppercase;
+    }
+    .vital-field input {
+      padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font: inherit; font-size: var(--fs-md); font-weight: 500; color: var(--fg);
+      background: var(--bg); transition: border-color 0.2s, box-shadow 0.2s;
+      width: 100%;
+    }
+    .vital-field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+    .vital-field input.warning {
+      border-color: var(--warning); box-shadow: 0 0 0 2px var(--warning-soft);
+    }
+    .vital-field input.danger {
+      border-color: var(--danger); box-shadow: 0 0 0 2px var(--danger-soft);
+    }
+    .vital-field .v-unit { font-size: var(--fs-xs); color: var(--muted); margin-top: 1px; }
+    .vital-field .v-alert {
+      display: none; align-items: center; gap: 4px;
+      font-size: var(--fs-xs); font-weight: 500; margin-top: 2px;
+    }
+    .vital-field .v-alert.visible { display: flex; }
+    .vital-field .v-alert svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; flex-shrink: 0; }
+    .vital-field .v-alert.warning { color: oklch(45% 0.18 85); }
+    .vital-field .v-alert.danger { color: var(--danger); }
+
+    .reason-area {
+      width: 100%; min-height: 100px;
+      padding: 14px 16px;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--bg); font: inherit; font-size: var(--fs-body);
+      color: var(--fg); resize: vertical; line-height: 1.6;
+    }
+    .reason-area:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+    .reason-area::placeholder { color: var(--muted); opacity: 0.6; }
+
+    .priority-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    }
+    .priority-card {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding: 18px 12px; border: 2px solid var(--border); border-radius: var(--radius);
+      background: var(--surface); cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+      -webkit-tap-highlight-color: transparent; user-select: none;
+    }
+    .priority-card:active { transform: scale(0.98); }
+    .priority-card .pc-icon { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; }
+    .priority-card .pc-icon svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .priority-card .pc-label { font-size: var(--fs-md); font-weight: 600; letter-spacing: -0.01em; }
+    .priority-card .pc-desc { font-size: var(--fs-sm); color: var(--muted); text-align: center; }
+    .priority-card .leader { display: none; width: 40%; height: 3px; border-radius: 999px; margin-top: 2px; }
+
+    .priority-card.selected { border-width: 2px; }
+    .priority-card.selected .leader { display: block; }
+
+    .priority-card.red    { border-color: var(--border); }
+    .priority-card.red .pc-icon { background: var(--danger); }
+    .priority-card.red .pc-label { color: var(--danger); }
+    .priority-card.red.selected { border-color: var(--danger); box-shadow: 0 0 0 3px var(--danger-soft); }
+    .priority-card.red.selected .leader { background: var(--danger); }
+
+    .priority-card.yellow { border-color: var(--border); }
+    .priority-card.yellow .pc-icon { background: var(--warning); }
+    .priority-card.yellow .pc-label { color: oklch(45% 0.18 85); }
+    .priority-card.yellow.selected { border-color: var(--warning); box-shadow: 0 0 0 3px var(--warning-soft); }
+    .priority-card.yellow.selected .leader { background: var(--warning); }
+
+    .priority-card.green  { border-color: var(--border); }
+    .priority-card.green .pc-icon { background: var(--safe); }
+    .priority-card.green .pc-label { color: var(--safe); }
+    .priority-card.green.selected { border-color: var(--safe); box-shadow: 0 0 0 3px var(--safe-soft); }
+    .priority-card.green.selected .leader { background: var(--safe); }
+
+    .bottom-bar {
+      display: flex; align-items: center; justify-content: flex-end; gap: 16px;
+      padding-top: 8px;
+    }
+    .bottom-bar .info { font-size: var(--fs-sm); color: var(--muted); font-family: var(--font-mono); letter-spacing: 0.03em; }
+
+    .btn-primary {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 16px 32px;
+      background: var(--accent); color: #fff; border: 0; border-radius: var(--radius);
+      font: inherit; font-size: var(--fs-lg); font-weight: 600;
+      cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+      min-width: 260px;
+    }
+    .btn-primary:active { transform: scale(0.99); }
+    .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+    .btn-primary svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.7; }
+
+    .toast {
+      position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+      background: var(--accent); color: #fff; padding: 14px 28px;
+      border-radius: 999px; font-size: var(--fs-md); font-weight: 500;
+      z-index: 200; box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      animation: toastIn 0.35s ease-out both;
+      display: flex; align-items: center; gap: 10px;
+      white-space: nowrap;
+    }
+    .toast svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+    @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(12px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+    .turno-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: var(--radius-pill);
+      background: var(--accent-soft); color: var(--accent);
+      font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 500;
+      letter-spacing: 0.03em;
+    }
+    .turno-chip svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.7; }
+
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+
+    @media (max-width: 768px) {
+      .header { padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
+      .layout { padding: 16px; gap: 16px; }
+      .vitals-grid { grid-template-columns: repeat(2, 1fr); }
+      .priority-grid { grid-template-columns: 1fr; }
+      .card { padding: 16px; }
+      .bottom-bar { flex-direction: column; align-items: stretch; }
+      .btn-primary { width: 100%; min-width: 0; }
+    }
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .vitals-grid { grid-template-columns: repeat(3, 1fr); }
+      .layout { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header" data-od-id="header">
+    <div class="header-left">
+      <img class="header-logo" src="nakawe-logo.jpeg" alt="Nakawe" />
+      <div class="header-title">
+        <h1>Triage · Enfermería</h1>
+        <div class="sub">Nakawe · Recepción</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="header-clock" id="headerClock"></span>
+      <span class="header-nss">Turno en línea: <strong id="turnoCount">0</strong></span>
+    </div>
+  </header>
+
+  <div class="layout" data-od-id="layout">
+
+    <!-- ─── Search ─── -->
+    <div class="card" data-od-id="search-card">
+      <div class="card-header">
+        <h2><svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>Buscar Paciente</h2>
+      </div>
+      <div class="search-area">
+        <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
+        <input class="search-input" id="searchInput" type="text"
+          placeholder="Buscar por Nombre o NSS"
+          autocomplete="off"
+          oninput="nakawe.onSearchInput()" />
+        <button class="search-clear" id="searchClear" onclick="nakawe.clearSearch()" aria-label="Limpiar búsqueda">×</button>
+        <div class="search-dropdown" id="searchDropdown"></div>
+      </div>
+
+      <div class="empty-state visible" id="emptyState">
+        <div class="es-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></div>
+        <div class="es-title">Escribe nombre o NSS del paciente</div>
+        <div class="es-sub">Los pacientes que ya completaron su registro digital aparecerán aquí para capturar sus signos vitales y asignar turno.</div>
+      </div>
+
+      <div class="error-state" id="errorState">
+        <div class="es-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16v0"/></svg></div>
+        <div class="es-title">Paciente no encontrado</div>
+        <div class="es-sub">Verifica el nombre o NSS. Si el paciente no ha hecho su registro digital, indícale que debe registrarse primero en la app Nakawe.</div>
+      </div>
+
+      <div class="patient-card" id="patientCard">
+        <div class="pc-avatar" id="pcAvatar">MR</div>
+        <div class="pc-info">
+          <div class="pc-name" id="pcName">—</div>
+          <div class="pc-detail" id="pcDetail">NSS · —</div>
+        </div>
+        <div class="pc-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+      </div>
+    </div>
+
+    <!-- ─── Form card (hidden until patient confirmed) ─── -->
+    <div class="card" id="formCard" style="display:none" data-od-id="form-card">
+      <div class="card-header">
+        <h2><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12h6M12 9v6"/></svg>Signos Vitales</h2>
+        <span class="turno-chip" id="turnoChip"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Turno —</span>
+      </div>
+
+      <div class="vitals-grid" data-od-id="vitals-grid">
+        <div class="vital-field">
+          <label>Presión Arterial</label>
+          <input type="text" id="vitalPA" placeholder="Ej. 120/80" oninput="nakawe.validateVitals()" />
+          <span class="v-unit">mmHg</span>
+          <span class="v-alert" id="alertPA"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> <span></span></span>
+        </div>
+        <div class="vital-field">
+          <label>Temperatura</label>
+          <input type="text" id="vitalTemp" placeholder="Ej. 36.5" oninput="nakawe.validateVitals()" />
+          <span class="v-unit">°C</span>
+          <span class="v-alert" id="alertTemp"><svg viewBox="0 0 24 24"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg> <span></span></span>
+        </div>
+        <div class="vital-field">
+          <label>Frec. Cardíaca</label>
+          <input type="text" id="vitalHR" placeholder="Ej. 72" oninput="nakawe.validateVitals()" />
+          <span class="v-unit">lpm</span>
+          <span class="v-alert" id="alertHR"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> <span></span></span>
+        </div>
+        <div class="vital-field">
+          <label>SpO₂</label>
+          <input type="text" id="vitalSpO2" placeholder="Ej. 97" oninput="nakawe.validateVitals()" />
+          <span class="v-unit">%</span>
+          <span class="v-alert" id="alertSpO2"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> <span></span></span>
+        </div>
+        <div class="vital-field">
+          <label>Peso</label>
+          <input type="text" id="vitalPeso" placeholder="Ej. 72" oninput="nakawe.validateVitals()" />
+          <span class="v-unit">kg</span>
+          <span class="v-alert" id="alertPeso"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> <span></span></span>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:20px"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Motivo de la Visita</div>
+      <textarea class="reason-area" id="reasonArea" placeholder="Describe el síntoma principal o la razón por la que acude el paciente…"></textarea>
+
+      <div class="section-title" style="margin-top:24px"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Clasificación de Triage</div>
+      <div class="priority-grid" data-od-id="priority-grid">
+        <div class="priority-card red" onclick="nakawe.setPriority('red')">
+          <div class="pc-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+          <span class="pc-label">Emergencia</span>
+          <span class="pc-desc">Atención inmediata<br/>(Rojo)</span>
+          <span class="leader"></span>
+        </div>
+        <div class="priority-card yellow" onclick="nakawe.setPriority('yellow')">
+          <div class="pc-icon"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17v0"/></svg></div>
+          <span class="pc-label">Prioritario</span>
+          <span class="pc-desc">Requiere atención breve<br/>(Amarillo)</span>
+          <span class="leader"></span>
+        </div>
+        <div class="priority-card green" onclick="nakawe.setPriority('green')">
+          <div class="pc-icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+          <span class="pc-label">Estable</span>
+          <span class="pc-desc">Puede esperar<br/>(Verde)</span>
+          <span class="leader"></span>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <span class="info" id="formInfo">Completa los signos vitales y la clasificación</span>
+        <button class="btn-primary" id="btnSubmit" disabled onclick="nakawe.submitTriage()">
+          <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M8 10v4M12 10v4M16 10v4"/></svg>
+          Guardar y Asignar Turno
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const PACIENTES = [
+      { id: 1, nombre: 'María Rodríguez', edad: 68, nss: '12 34 56 7890', iniciales: 'MR', avatarBg: 'oklch(38% 0.17 160)' },
+      { id: 2, nombre: 'Pedro Hernández', edad: 72, nss: '98 76 54 3210', iniciales: 'PH', avatarBg: 'oklch(45% 0.14 240)' },
+      { id: 3, nombre: 'Carmen López', edad: 65, nss: '45 67 89 0123', iniciales: 'CL', avatarBg: 'oklch(55% 0.14 85)' },
+      { id: 4, nombre: 'José Martínez', edad: 70, nss: '32 10 98 7654', iniciales: 'JM', avatarBg: 'oklch(50% 0.16 30)' }
+    ];
+
+    const VITAL_RANGES = {
+      pa:   { warn: { min: '90/60', max: '140/90' }, danger: { min: '80/50', max: '180/110' } },
+      temp: { warn: { min: 36.0, max: 38.0 },        danger: { min: 35.0, max: 39.5 } },
+      hr:   { warn: { min: 50, max: 100 },            danger: { min: 40, max: 130 } },
+      spo2: { warn: { min: 92, max: 100 },            danger: { min: 85, max: 100 } },
+      peso: { warn: { min: 30, max: 200 },            danger: { min: 20, max: 300 } }
+    };
+
+    function parsePA(val) {
+      const parts = val.split('/').map(s => parseFloat(s.trim()));
+      if (parts.length !== 2 || isNaN(parts[0]) || isNaN(parts[1])) return null;
+      return { sys: parts[0], dia: parts[1] };
+    }
+
+    function valInRange(val, range) {
+      if (typeof range.min === 'string' && typeof range.max === 'string') {
+        const v = parsePA(val);
+        if (!v) return null;
+        const min = parsePA(range.min), max = parsePA(range.max);
+        if (!min || !max) return null;
+        if (v.sys < min.sys || v.dia < min.dia || v.sys > max.sys || v.dia > max.dia) return false;
+        return true;
+      }
+      const n = parseFloat(val);
+      if (isNaN(n)) return null;
+      return n >= range.min && n <= range.max;
+    }
+
+    const nakawe = {
+      activePatient: null,
+      selectedPriority: null,
+      turnoCount: 0,
+      searchDebounce: null,
+
+      init() {
+        this.updateClock();
+        setInterval(() => this.updateClock(), 60000);
+      },
+
+      updateClock() {
+        const now = new Date();
+        document.getElementById('headerClock').textContent = now.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+      },
+
+      onSearchInput() {
+        const val = document.getElementById('searchInput').value.trim();
+        const dropdown = document.getElementById('searchDropdown');
+        document.getElementById('searchClear').classList.toggle('visible', val.length > 0);
+
+        if (val.length < 2) {
+          dropdown.classList.remove('visible');
+          this.showEmpty();
+          return;
+        }
+
+        const normalized = val.toLowerCase().replace(/\s+/g, '');
+        const matches = PACIENTES.filter(p =>
+          p.nombre.toLowerCase().includes(normalized) ||
+          p.nss.replace(/\s+/g, '').includes(normalized)
+        );
+
+        if (matches.length === 0) {
+          dropdown.innerHTML =
+            `<div class="sd-empty">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16v0"/></svg>
+              Paciente no encontrado
+            </div>`;
+          dropdown.classList.add('visible');
+          this.clearPatient();
+          return;
+        }
+
+        dropdown.innerHTML = matches.map(p =>
+          `<div class="sd-option" onclick="nakawe.selectFromDropdown(${p.id})">
+            <div class="sd-avatar" style="background:${p.avatarBg}">${p.iniciales}</div>
+            <div class="sd-info">
+              <div class="sd-name">${this.escapeHtml(p.nombre)}</div>
+              <div class="sd-detail">NSS · ${p.nss}</div>
+            </div>
+            <span class="sd-age">${p.edad} años</span>
+          </div>`
+        ).join('');
+        dropdown.classList.add('visible');
+
+        document.getElementById('emptyState').classList.remove('visible');
+        document.getElementById('errorState').classList.remove('visible');
+        document.getElementById('patientCard').classList.remove('visible');
+      },
+
+      selectFromDropdown(id) {
+        const p = PACIENTES.find(x => x.id === id);
+        if (!p) return;
+        document.getElementById('searchDropdown').classList.remove('visible');
+        document.getElementById('searchInput').value = p.nombre;
+        document.getElementById('searchClear').classList.add('visible');
+        this.showPatient(p);
+      },
+
+      clearSearch() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('searchClear').classList.remove('visible');
+        document.getElementById('searchDropdown').classList.remove('visible');
+        this.clearPatient();
+        this.showEmpty();
+      },
+
+      showEmpty() {
+        document.getElementById('emptyState').classList.add('visible');
+        document.getElementById('errorState').classList.remove('visible');
+        document.getElementById('patientCard').classList.remove('visible');
+      },
+
+      showPatient(p) {
+        document.getElementById('emptyState').classList.remove('visible');
+        document.getElementById('errorState').classList.remove('visible');
+        const card = document.getElementById('patientCard');
+        card.classList.add('visible');
+        document.getElementById('pcAvatar').textContent = p.iniciales;
+        document.getElementById('pcAvatar').style.background = p.avatarBg;
+        document.getElementById('pcName').textContent = p.nombre;
+        document.getElementById('pcDetail').textContent = `${p.edad} años · NSS ${p.nss}`;
+        this.activePatient = p;
+        this.showForm();
+      },
+
+      clearPatient() {
+        this.activePatient = null;
+        document.getElementById('patientCard').classList.remove('visible');
+        document.getElementById('formCard').style.display = 'none';
+        this.selectedPriority = null;
+        document.querySelectorAll('.priority-card').forEach(c => c.classList.remove('selected'));
+        document.getElementById('btnSubmit').disabled = true;
+        document.getElementById('searchDropdown').classList.remove('visible');
+      },
+
+      showForm() {
+        const fc = document.getElementById('formCard');
+        fc.style.display = 'block';
+        fc.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        this.turnoCount++;
+        document.getElementById('turnoCount').textContent = this.turnoCount;
+        document.getElementById('turnoChip').innerHTML =
+          `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Turno #${String(this.turnoCount).padStart(3, '0')}`;
+
+        document.querySelectorAll('.vital-field input').forEach(inp => {
+          inp.value = '';
+          inp.className = '';
+        });
+        document.querySelectorAll('.v-alert').forEach(a => a.classList.remove('visible'));
+        document.getElementById('reasonArea').value = '';
+        this.selectedPriority = null;
+        document.querySelectorAll('.priority-card').forEach(c => c.classList.remove('selected'));
+        document.getElementById('btnSubmit').disabled = true;
+        document.getElementById('formInfo').textContent = 'Completa los signos vitales y la clasificación';
+      },
+
+      validateVitals() {
+        const pa = document.getElementById('vitalPA').value.trim();
+        const temp = document.getElementById('vitalTemp').value.trim();
+        const hr = document.getElementById('vitalHR').value.trim();
+        const spo2 = document.getElementById('vitalSpO2').value.trim();
+        const peso = document.getElementById('vitalPeso').value.trim();
+
+        this._validateField('PA', pa, VITAL_RANGES.pa);
+        this._validateField('Temp', temp, VITAL_RANGES.temp);
+        this._validateField('HR', hr, VITAL_RANGES.hr);
+        this._validateField('SpO2', spo2, VITAL_RANGES.spo2);
+        this._validateField('Peso', peso, VITAL_RANGES.peso);
+
+        const filled = pa && temp && hr && spo2 && peso;
+        const ready = filled && this.selectedPriority;
+        document.getElementById('btnSubmit').disabled = !ready;
+        document.getElementById('formInfo').textContent = ready
+          ? 'Todos los campos completados'
+          : filled
+            ? 'Selecciona la clasificación de triage'
+            : 'Completa los signos vitales y la clasificación';
+      },
+
+      _validateField(name, val, range) {
+        const inp = document.getElementById('vital' + name);
+        const alert = document.getElementById('alert' + name);
+        if (!val) {
+          inp.className = '';
+          alert.classList.remove('visible');
+          return;
+        }
+        const status = valInRange(val, range);
+        if (status === null) {
+          inp.className = '';
+          alert.classList.remove('visible');
+          return;
+        }
+        if (status) {
+          inp.className = '';
+          alert.classList.remove('visible');
+        } else {
+          inp.className = 'warning';
+          const isDanger = valInRange(val, range.danger ? range.danger : { min: -Infinity, max: Infinity });
+          if (!isDanger) {
+            inp.className = 'danger';
+            alert.className = 'v-alert danger visible';
+          } else {
+            alert.className = 'v-alert warning visible';
+          }
+          const label = inp.placeholder || '';
+          alert.querySelector('span').textContent = `Fuera de rango normal (${range.warn.min}-${range.warn.max})`;
+        }
+      },
+
+      setPriority(level) {
+        document.querySelectorAll('.priority-card').forEach(c => c.classList.remove('selected'));
+        document.querySelector('.priority-card.' + level).classList.add('selected');
+        this.selectedPriority = level;
+        this.validateVitals();
+      },
+
+      submitTriage() {
+        if (!this.activePatient || !this.selectedPriority) return;
+
+        const pa = document.getElementById('vitalPA').value;
+        const temp = document.getElementById('vitalTemp').value;
+        const hr = document.getElementById('vitalHR').value;
+        const spo2 = document.getElementById('vitalSpO2').value;
+        const peso = document.getElementById('vitalPeso').value;
+        const motivo = document.getElementById('reasonArea').value.trim();
+
+        const labelMap = { red: 'Emergencia', yellow: 'Prioritario', green: 'Estable' };
+        const colorMap = { red: 'rojo', yellow: 'amarillo', green: 'verde' };
+
+        const turnoStr = String(this.turnoCount).padStart(3, '0');
+        const msg = `${this.activePatient.nombre} · Turno #${turnoStr} · Triage: ${labelMap[this.selectedPriority]} (${colorMap[this.selectedPriority]})`;
+
+        this.showToast(msg, true);
+
+        setTimeout(() => {
+          document.getElementById('searchInput').value = '';
+          document.getElementById('searchClear').classList.remove('visible');
+          this.clearPatient();
+          this.showEmpty();
+        }, 1200);
+      },
+
+      showToast(msg, success) {
+        const existing = document.querySelector('.toast');
+        if (existing) existing.remove();
+        const t = document.createElement('div');
+        t.className = 'toast';
+        if (success) {
+          t.innerHTML = `<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>${this.escapeHtml(msg)}`;
+        }
+        document.body.appendChild(t);
+        setTimeout(() => {
+          t.style.opacity = '0';
+          t.style.transition = 'opacity 0.3s';
+          setTimeout(() => t.remove(), 400);
+        }, 3000);
+      },
+
+      escapeHtml(s) {
+        const d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => nakawe.init());
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.search-area')) {
+        document.getElementById('searchDropdown').classList.remove('visible');
+      }
+    });
+  </script>
+</body>
+</html>

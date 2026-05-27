@@ -1,0 +1,11 @@
+# Temp test files
+test-img.html
+luz-nobg.jpeg
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

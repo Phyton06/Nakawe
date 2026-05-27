@@ -1,0 +1,1175 @@
+<!doctype html>
+<!--
+  Nakawe v3 — Mobile PWA prototype (iPhone 15 Pro frame)
+  Color contrast iteration: deep emerald accent, darker muted text,
+  saturated semantic indicators, keeps warm cream background.
+  Warm clinical palette (creams + deep green), Web Speech API.
+-->
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nakawe · Portal del Paciente</title>
+  <link rel="manifest" href="data:application/json,{}" />
+  <style>
+    :root {
+      --bg:      oklch(97% 0.018 70);
+      --surface: oklch(99% 0.008 70);
+      --fg:      oklch(22% 0.02 50);
+      --muted:   oklch(30% 0.018 50);
+      --border:  oklch(90% 0.014 70);
+      --accent:  oklch(38% 0.17 160);
+      --accent-soft:  color-mix(in oklch, var(--accent) 18%, transparent);
+      --accent-warm:  oklch(62% 0.12 85);
+      --danger:  oklch(45% 0.24 30);
+      --warning: oklch(60% 0.24 85);
+      --safe:    oklch(45% 0.22 145);
+      --fg-soft:     color-mix(in oklch, var(--fg) 6%, transparent);
+      --luz-bubble:  color-mix(in oklch, var(--accent-warm) 6%, var(--surface));
+      --luz-avatar:  oklch(38% 0.17 160);
+
+      --font-display: 'Iowan Old Style', 'Charter', Georgia, serif;
+      --font-body:    -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+      --font-mono:    ui-monospace, 'SF Mono', Menlo, monospace;
+
+      --font-scale: 1;
+      --fs-h1: calc(26px * var(--font-scale));
+      --fs-h2: calc(20px * var(--font-scale));
+      --fs-h3: calc(17px * var(--font-scale));
+      --fs-body: calc(16px * var(--font-scale));
+      --fs-meta: calc(13px * var(--font-scale));
+      --fs-chat: calc(15px * var(--font-scale));
+
+      --radius-card: 18px;
+      --radius-pill: 999px;
+    }
+
+    /* ─── High Contrast modes (Windows-inspired) ──────────────────────── */
+    .hc-active { }
+    .hc-mode-1, .hc-mode-2, .hc-mode-3, .hc-mode-4 { display: none; }
+    .hc-active .hc-mode-1, .hc-active .hc-mode-2, .hc-active .hc-mode-3, .hc-active .hc-mode-4 { display: revert; }
+
+    .hc-active.hc-mode-1,
+    .hc-active .hc-mode-1 {
+      --bg:      oklch(0% 0 0) !important;
+      --surface: oklch(8% 0.005 200) !important;
+      --fg:      oklch(100% 0 0) !important;
+      --muted:   oklch(75% 0.02 200) !important;
+      --border:  oklch(35% 0.02 200) !important;
+      --accent:  oklch(72% 0.15 200) !important;
+      --accent-soft:  color-mix(in oklch, var(--accent) 25%, transparent) !important;
+      --accent-warm:  oklch(72% 0.15 200) !important;
+      --danger:  oklch(72% 0.20 30) !important;
+      --warning: oklch(85% 0.16 85) !important;
+      --safe:    oklch(75% 0.18 145) !important;
+      --fg-soft:     color-mix(in oklch, var(--fg) 14%, transparent) !important;
+      --luz-bubble:  oklch(10% 0.01 200) !important;
+      --luz-avatar:  oklch(72% 0.15 200) !important;
+    }
+    .hc-active.hc-mode-2,
+    .hc-active .hc-mode-2 {
+      --bg:      oklch(0% 0 0) !important;
+      --surface: oklch(8% 0.005 100) !important;
+      --fg:      oklch(90% 0.18 100) !important;
+      --muted:   oklch(65% 0.12 100) !important;
+      --border:  oklch(30% 0.08 100) !important;
+      --accent:  oklch(72% 0.18 130) !important;
+      --accent-soft:  color-mix(in oklch, var(--accent) 25%, transparent) !important;
+      --accent-warm:  oklch(72% 0.18 130) !important;
+      --danger:  oklch(72% 0.20 30) !important;
+      --warning: oklch(85% 0.16 85) !important;
+      --safe:    oklch(75% 0.18 130) !important;
+      --fg-soft:     color-mix(in oklch, var(--fg) 14%, transparent) !important;
+      --luz-bubble:  oklch(10% 0.01 100) !important;
+      --luz-avatar:  oklch(72% 0.18 130) !important;
+    }
+    .hc-active.hc-mode-3,
+    .hc-active .hc-mode-3 {
+      --bg:      oklch(0% 0 0) !important;
+      --surface: oklch(8% 0 0) !important;
+      --fg:      oklch(100% 0 0) !important;
+      --muted:   oklch(72% 0 0) !important;
+      --border:  oklch(38% 0 0) !important;
+      --accent:  oklch(85% 0 0) !important;
+      --accent-soft:  color-mix(in oklch, var(--accent) 22%, transparent) !important;
+      --accent-warm:  oklch(85% 0 0) !important;
+      --danger:  oklch(100% 0 0) !important;
+      --warning: oklch(100% 0 0) !important;
+      --safe:    oklch(100% 0 0) !important;
+      --fg-soft:     color-mix(in oklch, var(--fg) 14%, transparent) !important;
+      --luz-bubble:  oklch(10% 0 0) !important;
+      --luz-avatar:  oklch(85% 0 0) !important;
+      --status-icon-bg: var(--fg) !important;
+      --status-icon-fg: var(--bg) !important;
+    }
+    .hc-active.hc-mode-4,
+    .hc-active .hc-mode-4 {
+      --bg:      oklch(100% 0 0) !important;
+      --surface: oklch(93% 0 0) !important;
+      --fg:      oklch(0% 0 0) !important;
+      --muted:   oklch(35% 0 0) !important;
+      --border:  oklch(55% 0 0) !important;
+      --accent:  oklch(15% 0 0) !important;
+      --accent-soft:  color-mix(in oklch, var(--accent) 10%, transparent) !important;
+      --accent-warm:  oklch(15% 0 0) !important;
+      --danger:  oklch(0% 0 0) !important;
+      --warning: oklch(0% 0 0) !important;
+      --safe:    oklch(0% 0 0) !important;
+      --fg-soft:     color-mix(in oklch, var(--fg) 8%, transparent) !important;
+      --luz-bubble:  oklch(95% 0 0) !important;
+      --luz-avatar:  oklch(15% 0 0) !important;
+      --status-icon-bg: var(--fg) !important;
+      --status-icon-fg: var(--bg) !important;
+    }
+
+    .hc-active .card,
+    .hc-active .context-card,
+    .hc-active .bubble.luz,
+    .hc-active .patient-card,
+    .hc-active .ctrl-btn,
+    .hc-active .select-header .logo,
+    .hc-active .tabbar { backdrop-filter: none !important; }
+    .hc-active .tabbar { background: var(--surface) !important; border-top-color: var(--border) !important; }
+    .hc-active .scenario-toggle { background: var(--surface) !important; }
+    .hc-active .scenario-toggle button.active { box-shadow: none !important; border: 1px solid var(--fg) !important; background: var(--fg) !important; color: var(--bg) !important; }
+    .hc-active .scenario-toggle button { color: var(--muted) !important; }
+    .hc-active .context-card { background: var(--surface) !important; border-width: 2px !important; }
+    .hc-active .context-card .ctx-toggle { border-bottom: 1px solid var(--border) !important; }
+    .hc-active .context-card .status-tag.clinic { border: 1px solid var(--safe) !important; background: transparent !important; color: var(--safe) !important; }
+    .hc-active .context-card .status-tag.home { border: 1px solid var(--accent-warm) !important; background: transparent !important; color: var(--accent-warm) !important; }
+    .hc-active .bubble.luz { border-width: 2px !important; }
+    .hc-active .bubble.user { background: var(--accent) !important; color: var(--bg) !important; }
+    .hc-active .mic-btn { box-shadow: 0 0 0 3px var(--accent) !important; }
+    .hc-active .mic-btn.listening { background: var(--danger) !important; }
+    .hc-active .btn-primary { background: var(--accent) !important; color: var(--bg) !important; }
+    .hc-active .btn-tiny { background: var(--accent) !important; color: var(--bg) !important; }
+    .hc-active .btn-secondary { border-color: var(--border) !important; color: var(--fg) !important; }
+    .hc-active .pill { background: color-mix(in oklch, var(--accent) 25%, transparent) !important; color: var(--accent) !important; }
+    .hc-active .expo-badge { background: color-mix(in oklch, var(--accent) 25%, transparent) !important; color: var(--accent) !important; }
+        .hc-active .select-header .logo { filter: brightness(1.3) contrast(1.2) !important; }
+    .hc-active .profile-head .avatar-big { border: 2px solid var(--fg) !important; }
+    .hc-active .patient-card:active { border-color: var(--accent) !important; }
+    .hc-active .ctrl-btn.active { border-color: var(--accent) !important; color: var(--accent) !important; }
+    .hc-active .med-row .med-icon { background: color-mix(in oklch, var(--accent) 20%, transparent) !important; }
+    .hc-active .med-row .med-icon svg { stroke: var(--accent) !important; }
+    .hc-active .toggle.on { background: var(--accent) !important; }
+    .hc-active .toggle { background: var(--border) !important; }
+    .hc-active .context-card .med-icon { background: color-mix(in oklch, var(--accent) 20%, transparent) !important; }
+    .hc-active .context-card .med-icon svg { stroke: var(--accent) !important; }
+    .hc-active .profile-row { border-top-color: var(--border) !important; }
+    .hc-active .setting-toggle { border-top-color: var(--border) !important; }
+    .hc-active .luz-header .ctrl-btn { border-color: var(--border) !important; }
+    .hc-active .ctrl-label { color: var(--muted) !important; }
+    .hc-active .ctrl-group.active .ctrl-label { color: var(--accent) !important; }
+    .hc-active .bubble.luz .bubble-header .luz-label { color: var(--accent) !important; }
+    .hc-active .tab { color: var(--muted) !important; }
+    .hc-active .tab.active { color: var(--accent) !important; }
+    .hc-active .status-icon.taken { background: var(--safe) !important; }
+    .hc-active .status-icon.pending { background: var(--warning) !important; }
+    .hc-active .status-icon.missed { background: var(--danger) !important; }
+    .hc-active .status-icon { border: 1px solid currentColor !important; }
+    .hc-active .card.flat { border-top-color: var(--border) !important; }
+    .hc-active .triage-dot { border: 1px solid var(--fg) !important; }
+    .hc-active .triage-dot.green  { background: var(--safe) !important; }
+    .hc-active .triage-dot.yellow { background: var(--warning) !important; }
+    .hc-active .triage-dot.red    { background: var(--danger) !important; }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      background: radial-gradient(60% 80% at 50% 0%, color-mix(in oklch, var(--accent) 5%, var(--bg)) 0%, var(--bg) 60%);
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-size: var(--fs-body);
+      line-height: 1.4;
+      -webkit-font-smoothing: antialiased;
+      display: grid;
+      place-items: center;
+      padding: 32px;
+    }
+
+    .stage { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+    .caption { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+    .caption strong { color: var(--fg); font-weight: 500; }
+
+    .device {
+      position: relative;
+      width: 390px; height: 844px;
+      border-radius: 56px;
+      padding: 12px;
+      background: linear-gradient(160deg, #2a2a2c 0%, #1a1a1c 50%, #0e0e10 100%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.04) inset, 0 0 0 2px #000 inset, 0 28px 60px -12px rgba(0,0,0,0.45), 0 8px 20px -8px rgba(0,0,0,0.35);
+      isolation: isolate;
+    }
+    .device::before, .device::after {
+      content: '';
+      position: absolute;
+      width: 3px;
+      background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.06) 8%, transparent 16%, transparent 84%, rgba(255,255,255,0.04) 92%, transparent 100%);
+      top: 100px; bottom: 100px;
+      pointer-events: none;
+    }
+    .device::before { left: -1px; }
+    .device::after  { right: -1px; }
+
+    .island {
+      position: absolute;
+      top: 22px; left: 50%;
+      transform: translateX(-50%);
+      width: 124px; height: 36px;
+      background: #000;
+      border-radius: 999px;
+      z-index: 5;
+    }
+
+    .btn-rail { position: absolute; width: 4px; background: #0a0a0c; border-radius: 2px; }
+    .btn-rail.left-1  { left: -3px; top: 174px; height: 32px; }
+    .btn-rail.left-2  { left: -3px; top: 220px; height: 60px; }
+    .btn-rail.left-3  { left: -3px; top: 290px; height: 60px; }
+    .btn-rail.right-1 { right: -3px; top: 250px; height: 100px; }
+
+    .screen {
+      position: relative;
+      width: 100%; height: 100%;
+      background: var(--bg);
+      border-radius: 44px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: background 0.4s, color 0.4s;
+    }
+
+    .statusbar {
+      flex: 0 0 47px;
+      padding: 18px 26px 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--fg);
+      letter-spacing: -0.01em;
+      z-index: 2;
+      transition: color 0.4s;
+    }
+    .statusbar .right { display: inline-flex; align-items: center; gap: 6px; }
+    .statusbar svg { width: 17px; height: 11px; fill: var(--fg); transition: fill 0.4s; }
+    .statusbar .battery { width: 25px; }
+
+    .content {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding: 8px 0 28px;
+    }
+    .content::-webkit-scrollbar { display: none; }
+
+    .home-indicator {
+      flex: 0 0 28px;
+      position: relative;
+    }
+    .home-indicator::after {
+      content: '';
+      position: absolute;
+      left: 50%; bottom: 8px;
+      transform: translateX(-50%);
+      width: 134px; height: 5px;
+      background: var(--fg);
+      border-radius: 999px;
+      opacity: 0.85;
+      transition: background 0.4s;
+    }
+
+    .screen-view { display: none; }
+    .screen-view.active { display: flex; flex-direction: column; height: 100%; }
+
+    .pad     { padding-inline: 20px; }
+    .stack   { display: flex; flex-direction: column; gap: 16px; }
+    .row     { display: flex; align-items: center; gap: 12px; }
+    .row-between { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .grid-2  { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .grid-3  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+
+    .h2  { font-family: var(--font-display); font-size: var(--fs-h2); letter-spacing: -0.015em; line-height: 1.2; margin: 0; }
+    .h3  { font-size: var(--fs-h3); font-weight: 600; line-height: 1.3; margin: 0; }
+    .meta { font-family: var(--font-mono); font-size: var(--fs-meta); color: var(--muted); }
+    .num  { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+    .greeting {
+      font-family: var(--font-mono);
+      font-size: calc(11px * var(--font-scale));
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 4px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 16px;
+    }
+    .card.accent {
+      background: var(--accent);
+      color: #fff;
+      border-color: transparent;
+    }
+    .card.accent .meta { color: rgba(255,255,255,0.72); }
+    .card.warm {
+      background: linear-gradient(135deg, color-mix(in oklch, var(--accent-warm) 8%, var(--surface)), var(--surface));
+      border-color: color-mix(in oklch, var(--accent-warm) 20%, var(--border));
+    }
+    .card.flat { background: transparent; border: 0; padding: 12px 0; border-top: 1px solid var(--border); border-radius: 0; }
+    .card.flat:first-child { border-top: 0; padding-top: 0; }
+
+    .btn-primary {
+      display: flex; align-items: center; justify-content: center;
+      width: 100%;
+      min-height: 52px;
+      padding: 16px 20px;
+      background: var(--accent);
+      color: #fff;
+      border: 0;
+      border-radius: 14px;
+      font: inherit;
+      font-size: calc(17px * var(--font-scale));
+      font-weight: 600;
+      letter-spacing: -0.005em;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-primary:active { transform: scale(0.97); }
+    .btn-secondary {
+      display: flex; align-items: center; justify-content: center;
+      width: 100%;
+      min-height: 48px;
+      padding: 14px 20px;
+      background: transparent;
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      font: inherit;
+      font-size: calc(15px * var(--font-scale));
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .btn-ghost {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 44px;
+      padding: 10px 16px;
+      background: transparent;
+      color: var(--muted);
+      border: 0;
+      border-radius: 14px;
+      font: inherit;
+      font-size: calc(14px * var(--font-scale));
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: calc(10px * var(--font-scale));
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-soft), var(--fg-soft)), var(--surface);
+      border: 1px solid var(--border);
+    }
+    .avatar.lg { width: 64px; height: 64px; }
+
+    .tabbar {
+      flex: 0 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 8px 8px 0;
+      border-top: 1px solid var(--border);
+      background: color-mix(in oklch, var(--bg) 92%, transparent);
+      backdrop-filter: blur(20px);
+      transition: background 0.4s, border-color 0.4s;
+    }
+    .tab {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      padding: 8px 0;
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+    }
+    .tab.active { color: var(--accent); }
+    .tab svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 1.7; }
+    .tab.active svg { stroke-width: 2; }
+
+    .select-header {
+      text-align: center;
+      padding: 20px 20px 4px;
+    }
+    .select-header .logo {
+      width: 72px; height: 72px;
+      border-radius: 18px;
+      margin-bottom: 10px;
+      object-fit: cover;
+    }
+    .select-header h1 { font-family: var(--font-display); font-size: 24px; letter-spacing: -0.02em; margin: 0 0 2px; }
+    .select-header p { color: var(--muted); font-size: 13px; margin: 0; }
+    .select-header .expo-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      margin-top: 6px;
+      padding: 3px 10px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .patient-grid {
+      padding: 12px 16px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .patient-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      min-height: 64px;
+    }
+    .patient-card:active {
+      transform: scale(0.98);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-soft);
+    }
+    .patient-card .pat-avatar {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      display: grid; place-items: center;
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .patient-card .pat-info { flex: 1; }
+    .patient-card .pat-info .pat-name { font-weight: 600; font-size: 16px; }
+    .patient-card .pat-info .pat-detail { color: var(--muted); font-size: 13px; margin-top: 1px; }
+    .patient-card .pat-chevron { color: var(--border); font-size: 18px; }
+
+    .select-footer {
+      padding: 4px 20px 12px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      letter-spacing: 0.04em;
+    }
+
+    .context-zone {
+      padding: 6px 20px 0;
+      flex-shrink: 0;
+    }
+    .context-card {
+      border-radius: var(--radius-card);
+      background: linear-gradient(135deg, color-mix(in oklch, var(--accent-warm) 8%, var(--surface)), var(--surface));
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: all 0.35s ease;
+    }
+    .context-card.collapsed { background: var(--surface); }
+    .context-card .ctx-toggle {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 14px; cursor: pointer;
+      -webkit-tap-highlight-color: transparent; user-select: none;
+    }
+    .context-card .ctx-toggle .ctx-summary {
+      display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;
+    }
+    .context-card .ctx-toggle .ctx-summary .status-dot-mini {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    }
+    .context-card .ctx-toggle .ctx-summary .ctx-label {
+      font-size: calc(13px * var(--font-scale)); font-weight: 500;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .context-card .ctx-toggle .ctx-summary .ctx-value {
+      font-family: var(--font-mono); font-size: calc(13px * var(--font-scale));
+      color: var(--muted); white-space: nowrap;
+    }
+    .context-card .ctx-toggle .ctx-chevron {
+      width: 24px; height: 24px; display: grid; place-items: center;
+      color: var(--muted); transition: transform 0.3s; flex-shrink: 0;
+    }
+    .context-card .ctx-toggle .ctx-chevron.open { transform: rotate(180deg); }
+    .context-card .ctx-body { padding: 0 14px 14px; display: none; }
+    .context-card.expanded .ctx-body { display: block; }
+
+    .context-card .status-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 3px 10px; border-radius: 999px;
+      font-family: var(--font-mono); font-size: calc(10px * var(--font-scale));
+      letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500;
+    }
+    .context-card .status-tag.clinic {
+      background: color-mix(in oklch, var(--safe) 14%, transparent); color: var(--safe);
+    }
+    .context-card .status-tag.home {
+      background: color-mix(in oklch, var(--accent-warm) 14%, transparent); color: var(--accent-warm);
+    }
+    .context-card .big-number {
+      font-family: var(--font-display); font-size: calc(36px * var(--font-scale));
+      letter-spacing: -0.03em; line-height: 1; margin: 10px 0 2px;
+    }
+    .context-card .big-number .num { font-size: calc(36px * var(--font-scale)); }
+    .context-card .sub { color: var(--muted); font-size: calc(13px * var(--font-scale)); }
+    .context-card .btn-tiny {
+      display: inline-flex; align-items: center; gap: 8px;
+      min-height: 44px; padding: 10px 20px;
+      background: var(--accent); color: #fff; border: 0; border-radius: 999px;
+      font: inherit; font-size: calc(15px * var(--font-scale)); font-weight: 600; cursor: pointer;
+    }
+    .context-card .next-action { display: flex; align-items: center; gap: 14px; padding: 10px 0 4px; }
+    .context-card .next-action .med-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--accent-soft); display: grid; place-items: center; }
+    .context-card .next-action .med-icon svg { width: 22px; height: 22px; stroke: var(--accent); fill: none; stroke-width: 1.7; }
+    .context-card .next-action .info { flex: 1; }
+    .context-card .next-action .info .name { font-weight: 600; font-size: calc(16px * var(--font-scale)); }
+    .context-card .next-action .info .time { color: var(--muted); font-size: calc(13px * var(--font-scale)); margin-top: 2px; }
+
+    .triage-dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+    .triage-dot.green  { background: var(--safe); }
+    .triage-dot.yellow { background: var(--warning); }
+    .triage-dot.red    { background: var(--danger); }
+    .triage-dot.grey   { background: var(--muted); }
+
+    .luz-zone {
+      flex: 1; display: flex; flex-direction: column;
+      padding: 0 20px; margin-top: 4px; min-height: 0; position: relative;
+    }
+    .luz-header { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; flex-shrink: 0; }
+    .luz-header .title { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: calc(15px * var(--font-scale)); }
+    .luz-header .title .luz-icon { width: 36px; height: 36px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+    .luz-header .title .luz-icon .luz-img { width: 100%; height: 100%; object-fit: cover; }
+    .luz-header .controls { display: flex; gap: 6px; }
+    .ctrl-group { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .luz-header .ctrl-btn { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--border); background: var(--surface); display: grid; place-items: center; cursor: pointer; color: var(--muted); font-size: 14px; transition: border-color 0.2s, color 0.2s, background 0.2s; }
+    .luz-header .ctrl-btn.active { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+    .luz-header .ctrl-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .ctrl-label { font-size: 10px; letter-spacing: 0.02em; color: var(--muted); white-space: nowrap; font-weight: 500; transition: color 0.2s; }
+    .ctrl-group.active .ctrl-label { color: var(--accent); }
+
+    .chat-area { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 4px 0 8px; min-height: 0; }
+    .chat-area::-webkit-scrollbar { display: none; }
+
+    .chat-input {
+      padding: 6px 0; display: flex; gap: 8px; align-items: center; flex-shrink: 0;
+    }
+    .chat-input input {
+      flex: 1; min-height: 48px; padding: 12px 18px;
+      border: 2px solid var(--border); border-radius: var(--radius-pill);
+      background: var(--surface); color: var(--fg);
+      font: inherit; font-size: calc(15px * var(--font-scale));
+      transition: border-color 0.2s;
+    }
+    .chat-input input:focus { outline: none; border-color: var(--accent); }
+    .chat-input input::placeholder { color: var(--muted); }
+    .chat-input .send-btn {
+      width: 48px; height: 48px; border-radius: 50%; border: 0;
+      background: var(--accent); color: #fff;
+      display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
+      transition: transform 0.15s, background 0.2s;
+    }
+    .chat-input .send-btn:active { transform: scale(0.93); }
+    .chat-input .send-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .hc-active .chat-input input { border-width: 2px; border-color: var(--border); }
+    .hc-active .chat-input input:focus { border-color: var(--accent); }
+    .hc-active .chat-input .send-btn { border: 2px solid var(--accent); }
+
+    .bubble { max-width: 88%; padding: 12px 16px; border-radius: 16px; font-size: var(--fs-chat); line-height: 1.5; animation: msgIn 0.3s ease-out both; }
+    .bubble.luz { align-self: flex-start; background: var(--luz-bubble); border: 1px solid color-mix(in oklch, var(--accent-warm) 15%, var(--border)); color: var(--fg); }
+    .bubble.user { align-self: flex-end; background: var(--accent); color: #fff; border: 0; }
+    .bubble.luz .bubble-header { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+    .bubble.luz .bubble-header .luz-mini { width: 24px; height: 24px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+    .bubble.luz .bubble-header .luz-mini .luz-img { width: 100%; height: 100%; object-fit: cover; }
+    .bubble.luz .bubble-header .luz-label { font-family: var(--font-mono); font-size: calc(10px * var(--font-scale)); letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+
+    @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .fab-mic { display: flex; justify-content: center; padding: 4px 0 2px; flex-shrink: 0; }
+    .fab-mic button { width: 80px; height: 80px; border-radius: 50%; border: 0; background: linear-gradient(135deg, var(--accent), color-mix(in oklch, var(--accent) 80%, #000)); color: #fff; display: grid; place-items: center; cursor: pointer; box-shadow: 0 6px 28px color-mix(in oklch, var(--accent) 40%, transparent), 0 0 0 4px color-mix(in oklch, var(--accent) 12%, transparent); transition: transform 0.2s, box-shadow 0.2s; position: relative; -webkit-tap-highlight-color: transparent; }
+    .fab-mic button:active { transform: scale(0.94); }
+    .fab-mic button svg { width: 32px; height: 32px; stroke: currentColor; fill: none; stroke-width: 1.7; }
+    .fab-mic button .fab-ring { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 3px solid var(--accent); opacity: 0; animation: none; pointer-events: none; }
+    .fab-mic button .fab-ring:nth-child(2) { animation-delay: 0.4s; }
+    .fab-mic button .fab-ring:nth-child(3) { animation-delay: 0.8s; }
+    .fab-mic button.listening .fab-ring { animation: waveExpand 1.6s ease-out infinite; }
+    .fab-mic button.listening { background: var(--danger); box-shadow: 0 6px 32px color-mix(in oklch, var(--danger) 45%, transparent), 0 0 0 6px color-mix(in oklch, var(--danger) 18%, transparent); animation: fabPulse 1.2s ease-in-out infinite; }
+    .fab-mic button.idle-pulse { animation: idleGlow 2.5s ease-in-out infinite; }
+
+    @keyframes waveExpand { 0% { transform: scale(1); opacity: 0.5; } 100% { transform: scale(2); opacity: 0; } }
+    @keyframes fabPulse { 0%, 100% { box-shadow: 0 6px 32px color-mix(in oklch, var(--danger) 45%, transparent), 0 0 0 6px color-mix(in oklch, var(--danger) 18%, transparent); } 50% { box-shadow: 0 6px 40px color-mix(in oklch, var(--danger) 55%, transparent), 0 0 0 10px color-mix(in oklch, var(--danger) 12%, transparent); } }
+    @keyframes idleGlow { 0%, 100% { box-shadow: 0 6px 28px color-mix(in oklch, var(--accent) 30%, transparent), 0 0 0 4px color-mix(in oklch, var(--accent) 8%, transparent); } 50% { box-shadow: 0 6px 36px color-mix(in oklch, var(--accent) 45%, transparent), 0 0 0 8px color-mix(in oklch, var(--accent) 6%, transparent); } }
+
+    .med-header { padding: 8px 20px 12px; display: flex; align-items: center; justify-content: space-between; }
+    .med-header h1 { font-family: var(--font-display); font-size: var(--fs-h1); letter-spacing: -0.02em; line-height: 1.1; margin: 0; }
+    .med-group { margin-bottom: 20px; }
+    .med-group .group-label { font-family: var(--font-mono); font-size: calc(11px * var(--font-scale)); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+    .med-row { display: grid; grid-template-columns: 40px 1fr 34px; align-items: center; gap: 12px; padding: 14px 0; border-top: 1px solid var(--border); }
+    .med-row:first-child { border-top: 0; padding-top: 0; }
+    .med-row .med-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--accent-soft); display: grid; place-items: center; }
+    .med-row .med-icon svg { width: 18px; height: 18px; stroke: var(--accent); fill: none; stroke-width: 1.8; }
+    .med-row .info .name { font-weight: 500; font-size: calc(15px * var(--font-scale)); }
+    .med-row .info .schedule { color: var(--muted); font-size: calc(13px * var(--font-scale)); margin-top: 2px; }
+    .med-row .status-dot { display: none; }
+
+    .status-icon { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; }
+    .status-icon svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .status-icon.taken  { background: var(--safe); }
+    .status-icon.pending { background: var(--warning); }
+    .status-icon.missed { background: var(--danger); }
+
+    .profile-head { padding: 12px 20px 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; }
+    .profile-head .avatar-big { width: 80px; height: 80px; border-radius: 50%; color: #fff; display: grid; place-items: center; font-family: var(--font-display); font-size: 32px; font-weight: 600; }
+    .profile-head h1 { font-family: var(--font-display); font-size: calc(22px * var(--font-scale)); letter-spacing: -0.015em; margin: 0; }
+    .profile-head p { color: var(--muted); font-size: calc(14px * var(--font-scale)); margin: 0; }
+    .profile-section { padding: 0 20px; margin-top: 20px; }
+    .profile-section .section-label { font-family: var(--font-mono); font-size: calc(11px * var(--font-scale)); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+    .profile-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-top: 1px solid var(--border); }
+    .profile-row:first-child { border-top: 0; padding-top: 0; }
+    .profile-row .label { font-size: calc(15px * var(--font-scale)); }
+    .profile-row .value { font-size: calc(15px * var(--font-scale)); color: var(--muted); }
+    .setting-toggle { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-top: 1px solid var(--border); }
+    .setting-toggle:first-child { border-top: 0; padding-top: 0; }
+    .setting-toggle .label { font-size: calc(15px * var(--font-scale)); }
+    .toggle { width: 48px; height: 28px; border-radius: 999px; background: var(--border); position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+    .toggle.on { background: var(--accent); }
+    .toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: transform 0.2s; }
+    .toggle.on::after { transform: translateX(20px); }
+
+    .hc-mode-selector { margin-top: 12px; display: none; flex-direction: column; gap: 8px; }
+    .hc-mode-selector.visible { display: flex; }
+    .hc-mode-selector .hc-label { font-family: var(--font-mono); font-size: calc(10px * var(--font-scale)); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+    .hc-mode-chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .hc-mode-chip {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 8px 4px; border: 1px solid var(--border); border-radius: 12px;
+      background: var(--surface); cursor: pointer; transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .hc-mode-chip:active { transform: scale(0.96); }
+    .hc-mode-chip.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+    .hc-mode-chip .chip-preview { display: flex; gap: 2px; }
+    .hc-mode-chip .chip-preview span { width: 14px; height: 14px; border-radius: 3px; }
+    .hc-mode-chip .chip-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.03em; color: var(--muted); }
+    .hc-mode-chip.active .chip-label { color: var(--accent); font-weight: 600; }
+
+    .scenario-toggle { display: flex; gap: 4px; background: var(--fg-soft); border-radius: 999px; padding: 3px; margin-bottom: 6px; }
+    .scenario-toggle button { flex: 1; padding: 6px 12px; border: 0; border-radius: 999px; font: inherit; font-size: calc(12px * var(--font-scale)); font-weight: 500; cursor: pointer; background: transparent; color: var(--muted); transition: background 0.2s, color 0.2s; }
+    .scenario-toggle button.active { background: var(--surface); color: var(--fg); box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+
+    .screen-voice-overlay { display: none; }
+    .screen-voice-overlay.active { display: flex; flex-direction: column; position: absolute; inset: 0; z-index: 50; background: linear-gradient(170deg, oklch(15% 0.025 160) 0%, oklch(10% 0.02 170) 60%, oklch(8% 0.015 180) 100%); border-radius: 44px; overflow: hidden; animation: voiceFadeIn 0.4s ease-out both; }
+    @keyframes voiceFadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+    .voice-close-bar { display: flex; justify-content: flex-end; padding: 14px 20px; flex-shrink: 0; }
+    .voice-close-btn { padding: 8px 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 999px; color: rgba(255,255,255,0.7); font: inherit; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px); }
+    .voice-close-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+    .voice-orbit { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 0 24px; }
+    .voice-orbit .orb { width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, oklch(60% 0.2 155), oklch(38% 0.18 160) 50%, oklch(25% 0.14 165) 100%); box-shadow: 0 0 60px color-mix(in oklch, var(--accent) 25%, transparent), 0 0 120px color-mix(in oklch, var(--accent) 10%, transparent), inset 0 -20px 40px rgba(0,0,0,0.3); animation: orbBreath 3s ease-in-out infinite; position: relative; }
+    .orb-wave { position: absolute; inset: -8px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.1); animation: orbRing 2s ease-out infinite; }
+    .orb-wave:nth-child(2) { animation-delay: 0.6s; }
+    .orb-wave:nth-child(3) { animation-delay: 1.2s; }
+    @keyframes orbBreath { 0%, 100% { transform: scale(1); box-shadow: 0 0 60px color-mix(in oklch, var(--accent) 20%, transparent), 0 0 120px color-mix(in oklch, var(--accent) 8%, transparent), inset 0 -20px 40px rgba(0,0,0,0.3); } 50% { transform: scale(1.04); box-shadow: 0 0 80px color-mix(in oklch, var(--accent) 35%, transparent), 0 0 160px color-mix(in oklch, var(--accent) 15%, transparent), inset 0 -20px 40px rgba(0,0,0,0.3); } }
+    @keyframes orbRing { 0% { transform: scale(1); opacity: 0.4; } 100% { transform: scale(1.5); opacity: 0; } }
+    .voice-orbit .orb-label { font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-top: 8px; animation: labelBlink 1.8s ease-in-out infinite; }
+    @keyframes labelBlink { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+    .voice-orbit .orb-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 88px; height: 88px; border-radius: 50%; overflow: hidden; }
+    .voice-orbit .orb-logo .luz-img { width: 100%; height: 100%; object-fit: cover; }
+    .voice-captions { padding: 0 20px 20px; text-align: center; flex-shrink: 0; min-height: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .voice-captions .caption-text { font-size: calc(22px * var(--font-scale)); font-weight: 400; color: rgba(255,255,255,0.9); line-height: 1.4; max-width: 90%; }
+    .voice-captions .caption-text .voice-label { display: block; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+    .voice-end-call { padding: 0 40px 40px; flex-shrink: 0; display: flex; justify-content: center; }
+    .voice-end-call button { width: 56px; height: 56px; border-radius: 50%; border: 0; background: var(--danger); color: #fff; display: grid; place-items: center; cursor: pointer; box-shadow: 0 4px 20px color-mix(in oklch, var(--danger) 40%, transparent); transition: transform 0.2s; }
+    .voice-end-call button:active { transform: scale(0.9); }
+    .voice-end-call button svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+
+    .fade-in  { animation: fadeIn 0.35s ease-out both; }
+    .slide-up { animation: slideUp 0.35s ease-out both; }
+    @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    .haptic-indicator { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 8px 16px; border-radius: 999px; font-size: 12px; font-weight: 500; z-index: 100; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+    .haptic-indicator.show { opacity: 1; }
+
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+    @media (max-width: 440px) { body { padding: 12px; } .device { width: 100%; height: auto; aspect-ratio: 390 / 844; padding: 0; border-radius: 32px; } .device .island { top: 3%; width: 32%; height: 4.5%; } .device .btn-rail { display: none; } .device .screen { border-radius: 28px; } .device .statusbar { flex: 0 0 6%; padding: 4% 7% 0; font-size: 3.8vw; } .device .content { padding: 1% 0 4%; } .device .home-indicator { flex: 0 0 3.5%; } .device .home-indicator::after { width: 34%; height: 0.6%; bottom: 1%; } }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="caption"><strong>Nakawe</strong> · Portal del Paciente</div>
+    <div class="device" data-od-id="device">
+      <span class="btn-rail left-1" aria-hidden></span>
+      <span class="btn-rail left-2" aria-hidden></span>
+      <span class="btn-rail left-3" aria-hidden></span>
+      <span class="btn-rail right-1" aria-hidden></span>
+      <span class="island" aria-hidden></span>
+      <div class="screen" id="mainScreen" data-od-id="screen">
+        <div class="statusbar">
+          <span class="num">9:41</span>
+          <span class="right">
+            <svg viewBox="0 0 17 11" aria-hidden>
+              <rect x="0" y="7" width="3" height="4" rx="0.6"/>
+              <rect x="4" y="5" width="3" height="6" rx="0.6"/>
+              <rect x="8" y="3" width="3" height="8" rx="0.6"/>
+              <rect x="12" y="0" width="3" height="11" rx="0.6"/>
+            </svg>
+            <svg viewBox="0 0 17 11" aria-hidden>
+              <path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1zM3.5 7.6L5 9.1c1-0.9 2.2-1.4 3.5-1.4 1.3 0 2.5 0.5 3.5 1.4l1.5-1.5c-1.4-1.3-3.1-2-5-2-1.9 0-3.6 0.7-5 2zM6.5 10.6l2 2 2-2c-0.5-0.5-1.2-0.8-2-0.8s-1.5 0.3-2 0.8z"/>
+            </svg>
+            <svg class="battery" viewBox="0 0 25 11" aria-hidden>
+              <rect x="0.5" y="0.5" width="21" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity="0.45"/>
+              <rect x="22" y="3.5" width="1.5" height="4" rx="0.4" fill="currentColor" fill-opacity="0.45"/>
+              <rect x="2" y="2" width="18" height="7" rx="1.4"/>
+            </svg>
+          </span>
+        </div>
+        <main class="content" data-od-id="content">
+          <section class="screen-view active" id="screen-login" data-od-id="login">
+            <div class="select-header slide-up">
+              <img class="logo" src="./nakawe-logo.jpeg" alt="Nakawe">
+              <h1>Nakawe</h1>
+              <p>Elige quién quiere hablar con LUZ</p>
+              <span class="expo-badge">✦ ExpoCiencias 2026</span>
+            </div>
+            <div class="patient-grid" id="patientGrid"></div>
+            <div class="select-footer">Pulsa el nombre de la persona que participa en la demostración</div>
+          </section>
+
+          <section class="screen-view" id="screen-main" data-od-id="main">
+            <div class="pad" style="padding-top: 4px;">
+              <div class="scenario-toggle" data-od-id="scenario-toggle">
+                <button class="active" data-scenario="clinic">En la Clínica</button>
+                <button data-scenario="home">En Casa</button>
+              </div>
+            </div>
+            <div class="context-zone" data-od-id="context-zone">
+              <div class="context-card collapsed" id="contextCard">
+                <div class="ctx-toggle" onclick="nakawe.toggleContextCard()">
+                  <div class="ctx-summary">
+                    <span class="status-dot-mini triage-dot green" id="ctxDot"></span>
+                    <span class="ctx-label" id="ctxLabel">Consulta general</span>
+                    <span class="ctx-value num" id="ctxValue">Turno #042</span>
+                  </div>
+                  <span class="ctx-chevron" id="ctxChevron">▾</span>
+                </div>
+                <div class="ctx-body" id="ctxBody">
+                  <div class="scenario-content" data-scenario="clinic">
+                    <div class="row-between">
+                      <span class="status-tag clinic"><span class="triage-dot green"></span>Consulta general</span>
+                      <span class="meta num">Turno #042</span>
+                    </div>
+                    <div class="big-number"><span class="num">15</span> min</div>
+                    <p class="sub">Tiempo estimado de espera</p>
+                    <div class="row" style="margin-top: 10px; gap: 8px;">
+                      <span class="triage-dot green" style="width: 18px; height: 18px;" title="Prioridad normal"></span>
+                      <span style="font-size: calc(13px * var(--font-scale)); color: var(--muted);">Tu turno está progresando normalmente</span>
+                    </div>
+                  </div>
+                  <div class="scenario-content" data-scenario="home" style="display:none">
+                    <div class="row-between">
+                      <span class="status-tag home">Post‑consulta</span>
+                      <span class="meta">Próxima cita: 12 jun</span>
+                    </div>
+                    <div class="next-action">
+                      <div class="med-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12" rx="6"/><line x1="12" y1="6" x2="12" y2="18"/></svg></div>
+                      <div class="info"><div class="name">Paracetamol 500 mg</div><div class="time">Próxima dosis · 8:00 PM</div></div>
+                    </div>
+                    <button class="btn-tiny" onclick="nakawe.takeMed()"><span>✓</span> Ya me lo tomé</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="luz-zone" data-od-id="luz-zone">
+              <div class="luz-header">
+                <span class="title">
+                  <span class="luz-icon"><img class="luz-img" src="./luz-nobg.jpeg" alt="LUZ"></span>
+                  LUZ · Asistente
+                </span>
+                <div class="controls">
+                  <div class="ctrl-group active" id="grpMute">
+                    <button class="ctrl-btn active" id="btnMute" onclick="nakawe.toggleMute()" aria-label="Silenciar LUZ" title="Silenciar voz">
+                      <svg viewBox="0 0 24 24" fill="none"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M23 9l-6 6m0-6l6 6"/></svg>
+                    </button>
+                    <span class="ctrl-label">Voz</span>
+                  </div>
+                  <div class="ctrl-group" id="grpHaptic">
+                    <button class="ctrl-btn" id="btnHaptic" onclick="nakawe.toggleHaptic()" aria-label="Alertas hápticas" title="Vibración">
+                      <svg viewBox="0 0 24 24" fill="none"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M3 9l2 3-2 3M21 9l-2 3 2 3"/></svg>
+                    </button>
+                    <span class="ctrl-label">Vibrar</span>
+                  </div>
+                </div>
+              </div>
+              <div class="chat-area" id="chatArea" data-od-id="chat">
+                <div class="bubble luz">
+                  <div class="bubble-header">
+                    <span class="luz-mini"><img class="luz-img" src="./luz-nobg.jpeg" alt="LUZ"></span>
+                    <span class="luz-label">LUZ</span>
+                  </div>
+                  Hola, soy LUZ. Pulsa el micrófono y dime cómo te sientes, o escribe tu consulta.
+                </div>
+                <div class="bubble luz">
+                  <div class="bubble-header">
+                    <span class="luz-mini"><img class="luz-img" src="./luz-nobg.jpeg" alt="LUZ"></span>
+                    <span class="luz-label">LUZ</span>
+                  </div>
+                  También puedo recordarte tus medicamentos, darte indicaciones, o conectarte con tu médico.
+                </div>
+              </div>
+              <div class="fab-mic">
+                <button class="idle-pulse" id="micBtn" onclick="nakawe.toggleMic()" aria-label="Activar micrófono">
+                  <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 19v3"/></svg>
+                  <span class="fab-ring"></span><span class="fab-ring"></span><span class="fab-ring"></span>
+                </button>
+              </div>
+              <div class="chat-input" id="chatInput">
+                <input type="text" id="msgInput" placeholder="Escribe tu mensaje…" autocomplete="off" enterkeyhint="send" />
+                <button class="send-btn" onclick="nakawe.sendMessage()" aria-label="Enviar mensaje">
+                  <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="screen-voice-overlay" id="voiceOverlay">
+              <div class="voice-close-bar">
+                <button class="voice-close-btn" onclick="nakawe.endVoiceMode()"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg> Salir</button>
+              </div>
+              <div class="voice-orbit">
+                <div class="orb">
+                  <span class="orb-logo"><img class="luz-img" src="./luz-nobg.jpeg" alt="LUZ"></span>
+                  <span class="orb-wave"></span><span class="orb-wave"></span><span class="orb-wave"></span>
+                </div>
+                <span class="orb-label" id="orbLabel">Escuchando…</span>
+              </div>
+              <div class="voice-captions" id="voiceCaptions">
+                <span class="caption-text" id="captionText"><span class="voice-label">LUZ</span>Te escucho, dime cómo te sientes.</span>
+              </div>
+              <div class="voice-end-call">
+                <button onclick="nakawe.endVoiceMode()" aria-label="Finalizar llamada" title="Finalizar">
+                  <svg viewBox="0 0 24 24"><path d="M22 12c0 5.5-4.5 10-10 10S2 17.5 2 12 6.5 2 12 2s10 4.5 10 10z"/><path d="M12 8v4M12 16v0"/></svg>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section class="screen-view" id="screen-meds" data-od-id="meds">
+            <div class="med-header" data-od-id="med-header">
+              <h1>Medicamentos</h1>
+              <button class="btn-ghost" style="font-size: calc(13px * var(--font-scale));" onclick="alert('Agregar medicamento')">+ Añadir</button>
+            </div>
+            <section class="pad med-group" data-od-id="meds-today">
+              <p class="group-label">Hoy · 25 de mayo</p>
+              <div class="med-row">
+                <div class="med-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12" rx="6"/><line x1="12" y1="6" x2="12" y2="18"/></svg></div>
+                <div class="info"><div class="name">Paracetamol 500 mg</div><div class="schedule">8:00 AM · 2:00 PM · 8:00 PM · Cada 8h</div></div>
+                <span class="status-icon taken"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+              </div>
+              <div class="med-row">
+                <div class="med-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12" rx="6"/><line x1="12" y1="6" x2="12" y2="18"/></svg></div>
+                <div class="info"><div class="name">Losartán 50 mg</div><div class="schedule">9:00 AM · Una vez al día</div></div>
+                <span class="status-icon taken"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+              </div>
+              <div class="med-row">
+                <div class="med-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12" rx="6"/><line x1="12" y1="6" x2="12" y2="18"/></svg></div>
+                <div class="info"><div class="name">Omeprazol 20 mg</div><div class="schedule">7:00 AM · Antes del desayuno</div></div>
+                <span class="status-icon pending"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
+              </div>
+              <div class="med-row">
+                <div class="med-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12" rx="6"/><line x1="12" y1="6" x2="12" y2="18"/></svg></div>
+                <div class="info"><div class="name">Metformina 850 mg</div><div class="schedule">12:00 PM · Con la comida</div></div>
+                <span class="status-icon pending"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
+              </div>
+            </section>
+            <section class="pad med-group" data-od-id="meds-ayer">
+              <p class="group-label">Ayer · 24 de mayo</p>
+              <div class="med-row">
+                <div class="med-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12" rx="6"/><line x1="12" y1="6" x2="12" y2="18"/></svg></div>
+                <div class="info"><div class="name">Paracetamol 500 mg</div><div class="schedule">3 dosis · Completado</div></div>
+                <span class="status-icon taken"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+              </div>
+              <div class="med-row">
+                <div class="med-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12" rx="6"/><line x1="12" y1="6" x2="12" y2="18"/></svg></div>
+                <div class="info"><div class="name">Losartán 50 mg</div><div class="schedule">1 dosis · Completado</div></div>
+                <span class="status-icon taken"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+              </div>
+              <div class="med-row">
+                <div class="med-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12" rx="6"/><line x1="12" y1="6" x2="12" y2="18"/></svg></div>
+                <div class="info"><div class="name">Metformina 850 mg</div><div class="schedule">1 dosis · Sin tomar</div></div>
+                <span class="status-icon missed"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
+              </div>
+            </section>
+          </section>
+
+          <section class="screen-view" id="screen-profile" data-od-id="profile">
+            <div class="profile-head" data-od-id="profile-head">
+              <div class="avatar-big" id="profileAvatar">MR</div>
+              <h1 id="profileName">María Rodríguez</h1>
+              <p id="profileSub">NSS · 12 34 56 7890 · Consultorio 4</p>
+            </div>
+            <div class="profile-section" data-od-id="profile-info">
+              <p class="section-label">Información</p>
+              <div class="profile-row"><span class="label">Edad</span><span class="value" id="profileAge">68 años</span></div>
+              <div class="profile-row"><span class="label">Tipo de sangre</span><span class="value" id="profileBlood">O+</span></div>
+              <div class="profile-row"><span class="label">Alergias</span><span class="value" id="profileAllergies">Penicilina</span></div>
+              <div class="profile-row"><span class="label">Médico asignado</span><span class="value" id="profileDoctor">Dra. Laura Méndez</span></div>
+              <div class="profile-row"><span class="label">Próxima cita</span><span class="value" id="profileDate">12 jun 2026</span></div>
+            </div>
+            <div class="profile-section" data-od-id="profile-settings">
+              <p class="section-label">Accesibilidad</p>
+              <div class="setting-toggle"><span class="label">Texto más grande</span><div class="toggle" onclick="nakawe.toggleFontScale(); this.classList.toggle('on')"></div></div>
+              <div class="setting-toggle"><span class="label">Alto contraste</span><div class="toggle" id="hcToggle" onclick="nakawe.toggleHighContrast()"></div></div>
+              <div class="hc-mode-selector" id="hcModeSelector">
+                <span class="hc-label">Elige un modo</span>
+                <div class="hc-mode-chips">
+                  <div class="hc-mode-chip active" data-hc-mode="1" onclick="nakawe.setHighContrastMode(1)">
+                    <div class="chip-preview"><span style="background:#000"></span><span style="background:oklch(72% 0.15 200)"></span><span style="background:#fff"></span></div>
+                    <span class="chip-label">Modo 1</span>
+                  </div>
+                  <div class="hc-mode-chip" data-hc-mode="2" onclick="nakawe.setHighContrastMode(2)">
+                    <div class="chip-preview"><span style="background:#000"></span><span style="background:oklch(72% 0.18 130)"></span><span style="background:oklch(90% 0.18 100)"></span></div>
+                    <span class="chip-label">Modo 2</span>
+                  </div>
+                  <div class="hc-mode-chip" data-hc-mode="3" onclick="nakawe.setHighContrastMode(3)">
+                    <div class="chip-preview"><span style="background:#000"></span><span style="background:#888"></span><span style="background:#fff"></span></div>
+                    <span class="chip-label">Modo 3</span>
+                  </div>
+                  <div class="hc-mode-chip" data-hc-mode="4" onclick="nakawe.setHighContrastMode(4)">
+                    <div class="chip-preview"><span style="background:#fff"></span><span style="background:#888"></span><span style="background:#000"></span></div>
+                    <span class="chip-label">Modo 4</span>
+                  </div>
+                </div>
+              </div>
+              <div class="setting-toggle"><span class="label">Modo daltonismo</span><div class="toggle" onclick="nakawe.toggleDaltonism(); this.classList.toggle('on')"></div></div>
+              <div class="setting-toggle"><span class="label">Alertas hápticas</span><div class="toggle on" onclick="nakawe.toggleHaptic(); this.classList.toggle('on')"></div></div>
+              <div class="setting-toggle"><span class="label">Voz de LUZ activada</span><div class="toggle on" onclick="nakawe.toggleMute(); this.classList.toggle('on')"></div></div>
+            </div>
+            <div class="pad" style="margin-top: 20px;">
+              <button class="btn-secondary" onclick="nakawe.selectPatient(null); nakawe.navTo('login');" style="color: var(--danger); border-color: color-mix(in oklch, var(--danger) 30%, transparent);">Cambiar de paciente</button>
+            </div>
+          </section>
+        </main>
+
+        <nav class="tabbar" id="tabbar" style="display:none" data-od-id="tabbar">
+          <div class="tab active" data-tab="main" onclick="nakawe.navTo('main')">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg> Inicio
+          </div>
+          <div class="tab" data-tab="meds" onclick="nakawe.navTo('meds')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="7" y="2" width="10" height="20" rx="5"/><line x1="7" y1="9" x2="17" y2="9"/><rect x="7" y="2" width="10" height="7" rx="5"/></svg> Medicinas
+          </div>
+          <div class="tab" data-tab="profile" onclick="nakawe.navTo('profile')">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg> Perfil
+          </div>
+        </nav>
+        <div class="home-indicator" aria-hidden></div>
+      </div>
+    </div>
+  </div>
+  <div class="haptic-indicator" id="hapticIndicator">Vibración</div>
+
+  <script>
+    const PACIENTES = [
+      { id:1, nombre:'María Rodríguez', edad:68, consultorio:4, iniciales:'MR', avatarBg:'oklch(60% 0.14 145)', nss:'12 34 56 7890', tipoSangre:'O+', alergias:'Penicilina', medico:'Dra. Laura Méndez', proxCita:'12 jun 2026' },
+      { id:2, nombre:'Pedro Hernández', edad:72, consultorio:2, iniciales:'PH', avatarBg:'oklch(58% 0.12 240)', nss:'98 76 54 3210', tipoSangre:'A+', alergias:'Aspirina', medico:'Dr. Roberto García', proxCita:'19 jun 2026' },
+      { id:3, nombre:'Carmen López', edad:65, consultorio:1, iniciales:'CL', avatarBg:'oklch(64% 0.13 85)', nss:'45 67 89 0123', tipoSangre:'B+', alergias:'Sulfa', medico:'Dra. Laura Méndez', proxCita:'5 jun 2026' },
+      { id:4, nombre:'José Martínez', edad:70, consultorio:3, iniciales:'JM', avatarBg:'oklch(58% 0.14 30)', nss:'32 10 98 7654', tipoSangre:'O+', alergias:'Ninguna', medico:'Dr. Roberto García', proxCita:'26 jun 2026' }
+    ];
+
+    const nakawe = {
+      currentScreen:'login', activePatient:null, micListening:false, voiceModeActive:false,
+      recognition:null, synth:window.speechSynthesis, muted:false, hapticOn:true,
+      scenario:'clinic', fontScale:1, highContrast:false, hcMode:null, daltonism:false,
+
+      initPatientSelector() {
+        document.getElementById('patientGrid').innerHTML = PACIENTES.map(p =>
+          `<div class="patient-card" data-patient-id="${p.id}" onclick="nakawe.selectPatient(${p.id})">
+            <div class="pat-avatar" style="background:${p.avatarBg}">${p.iniciales}</div>
+            <div class="pat-info"><div class="pat-name">${p.nombre}</div><div class="pat-detail">${p.edad} años · Consultorio ${p.consultorio}</div></div>
+            <span class="pat-chevron">›</span>
+          </div>`
+        ).join('');
+      },
+
+      selectPatient(id) { if (id===null) { this.activePatient=null; return; } this.activePatient = PACIENTES.find(p=>p.id===id); this.navTo('main'); },
+
+      updateProfileUI() {
+        const p = this.activePatient || PACIENTES[0];
+        document.getElementById('profileAvatar').textContent = p.iniciales;
+        document.getElementById('profileAvatar').style.background = p.avatarBg;
+        document.getElementById('profileName').textContent = p.nombre;
+        document.getElementById('profileSub').textContent = 'NSS · '+p.nss+' · Consultorio '+p.consultorio;
+        document.getElementById('profileAge').textContent = p.edad+' años';
+        document.getElementById('profileBlood').textContent = p.tipoSangre;
+        document.getElementById('profileAllergies').textContent = p.alergias;
+        document.getElementById('profileDoctor').textContent = p.medico;
+        document.getElementById('profileDate').textContent = p.proxCita;
+      },
+
+      navTo(s) {
+        document.querySelectorAll('.screen-view').forEach(v=>v.classList.remove('active'));
+        const t = document.getElementById('screen-'+s); if(t) t.classList.add('active');
+        const b = document.getElementById('tabbar');
+        if (s==='login') { b.style.display='none'; } else {
+          b.style.display='grid';
+          b.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===(s==='main'?'main':s)));
+        }
+        if (s==='profile') this.updateProfileUI();
+        this.currentScreen=s; this.scrollChat();
+      },
+
+      toggleContextCard() {
+        const c = document.getElementById('contextCard'), v = document.getElementById('ctxChevron');
+        c.classList.toggle('collapsed'); c.classList.toggle('expanded'); v.classList.toggle('open');
+      },
+
+      updateContextSummary() {
+        const d = document.getElementById('ctxDot'), l = document.getElementById('ctxLabel'), v = document.getElementById('ctxValue');
+        if (this.scenario==='clinic') { d.className='status-dot-mini triage-dot green'; l.textContent='Consulta general'; v.textContent='Turno #042 · 15 min'; }
+        else { d.className='status-dot-mini triage-dot yellow'; l.textContent='Post‑consulta'; v.textContent='Paracetamol 8:00 PM'; }
+      },
+
+      setScenario(s) {
+        this.scenario=s;
+        document.querySelectorAll('.scenario-content').forEach(e=>e.style.display=e.dataset.scenario===s?'':'none');
+        document.querySelectorAll('.scenario-toggle button').forEach(b=>b.classList.toggle('active', b.dataset.scenario===s));
+        this.updateContextSummary();
+      },
+
+      takeMed() {
+        const b = document.querySelector('#contextCard .btn-tiny');
+        if(b){ b.textContent='✓ Tomado'; b.style.background='var(--muted)'; b.disabled=true; }
+        this.addChat('luz','¡Bien hecho! Anotado: Paracetamol 500 mg a las '+new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})+'.');
+        if(!this.muted) this.speak('Bien hecho. Anotado tu medicamento.');
+        if(this.hapticOn) this.triggerHaptic();
+      },
+
+      toggleMic() { this.micListening ? this.stopListening() : this.startListening(); },
+
+      startListening() {
+        const btn = document.getElementById('micBtn');
+        this.micListening=true; btn.classList.add('listening'); btn.classList.remove('idle-pulse');
+        this.enterVoiceMode();
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+          const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+          this.recognition = new SR(); this.recognition.lang='es-MX'; this.recognition.continuous=false; this.recognition.interimResults=true;
+          this.recognition.onresult = (e) => {
+            let t=''; for(let i=e.resultIndex;i<e.results.length;i++){ t+=e.results[i][0].transcript; if(e.results[i].isFinal){ this.addChat('user',t); this.processQuery(t); this.setCaption('Tú',t,true); this.stopListening(); return; } }
+            if(t) this.setCaption('Tú',t+'…',false);
+          };
+          this.recognition.onerror = () => { this.addChat('luz','No te escuché bien. ¿Puedes repetirlo?'); this.setCaption('LUZ','No te escuché bien. ¿Puedes repetirlo?',true); this.stopListening(); };
+          this.recognition.start();
+        } else {
+          this.setCaption('LUZ','Escuchando…',false);
+          setTimeout(()=>{ const m='Me duele un poco la cabeza'; this.setCaption('Tú',m,true); this.addChat('user',m); this.processQuery(m); this.stopListening(); },2000);
+        }
+      },
+
+      stopListening() {
+        const btn = document.getElementById('micBtn');
+        this.micListening=false; btn.classList.remove('listening'); btn.classList.add('idle-pulse');
+        if(this.recognition){ try{this.recognition.stop()}catch(e){} this.recognition=null; }
+        if(this.voiceModeActive) setTimeout(()=>{ if(!this.micListening) this.exitVoiceMode(); },2500);
+      },
+
+      enterVoiceMode() { this.voiceModeActive=true; document.getElementById('voiceOverlay').classList.add('active'); document.getElementById('orbLabel').textContent='Escuchando…'; },
+      exitVoiceMode() { this.voiceModeActive=false; document.getElementById('voiceOverlay').classList.remove('active'); },
+      endVoiceMode() { this.stopListening(); this.exitVoiceMode(); },
+
+      setCaption(sp,tx,isFinal) {
+        document.getElementById('captionText').innerHTML = '<span class="voice-label">'+sp+'</span>'+this.escapeHtml(tx);
+        if(isFinal && sp==='LUZ'){ document.getElementById('orbLabel').textContent='Respondido'; setTimeout(()=>{ if(this.voiceModeActive) document.getElementById('orbLabel').textContent='Esperando…'; },1000); }
+      },
+
+      processQuery(text) {
+        const l = text.toLowerCase();
+        let r = '';
+        if(l.includes('duele')||l.includes('dolor')||l.includes('cabeza')||l.includes('mal')) r='Veo que tienes molestias. ¿Quieres que te recuerde tomar algo para el dolor o prefieres hablar con tu médico?';
+        else if(l.includes('medicina')||l.includes('medicamento')||l.includes('tomar')||l.includes('pastilla')) r='Tu próxima dosis es Paracetamol 500 mg a las 8:00 PM. ¿Ya te lo tomaste?';
+        else if(l.includes('cita')||l.includes('doctor')||l.includes('médico')||l.includes('consulta')) r='Tu próxima cita es el 12 de junio con la Dra. Laura Méndez. ¿Quieres que te recuerde un día antes?';
+        else if(l.includes('gracias')||l.includes('ok')||l.includes('bien')) r='Para eso estoy. Si necesitas algo más, aquí me tienes.';
+        else r='Entendido. Estoy aquí para ayudarte con tus medicamentos, citas, o cualquier duda de salud. ¿Qué más necesitas?';
+        setTimeout(()=>{ this.addChat('luz',r); this.setCaption('LUZ',r,true); if(!this.muted) this.speak(r); if(this.hapticOn) this.triggerHaptic(); },800);
+      },
+
+      addChat(role,text) {
+        const c = document.getElementById('chatArea'), b = document.createElement('div');
+        b.className = 'bubble '+role;
+        if(role==='luz') b.innerHTML='<div class="bubble-header"><span class="luz-mini"><img class="luz-img" src="./luz-nobg.jpeg" alt="LUZ"></span><span class="luz-label">LUZ</span></div>'+this.escapeHtml(text);
+        else b.textContent=text;
+        c.appendChild(b); this.scrollChat();
+      },
+
+      sendMessage() {
+        const inp = document.getElementById('msgInput');
+        const text = inp.value.trim();
+        if (!text) return;
+        inp.value = '';
+        this.addChat('user', text);
+        this.processQuery(text);
+        if (this.hapticOn) this.triggerHaptic();
+      },
+      scrollChat() { const c = document.getElementById('chatArea'); if(c) c.scrollTop = c.scrollHeight; },
+
+      speak(text) { if(!this.synth||this.muted) return; this.synth.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang='es-MX'; u.rate=0.9; this.synth.speak(u); },
+
+      toggleMute() { this.muted=!this.muted; document.getElementById('btnMute').classList.toggle('active',!this.muted); document.getElementById('grpMute').classList.toggle('active',!this.muted); if(this.muted&&this.synth) this.synth.cancel(); },
+      toggleHaptic() { this.hapticOn=!this.hapticOn; document.getElementById('btnHaptic').classList.toggle('active',this.hapticOn); document.getElementById('grpHaptic').classList.toggle('active',this.hapticOn); const i=document.getElementById('hapticIndicator'); if(this.hapticOn){ i.classList.add('show'); setTimeout(()=>i.classList.remove('show'),1200); } },
+      triggerHaptic() { if(!this.hapticOn) return; const i=document.getElementById('hapticIndicator'); i.classList.add('show'); setTimeout(()=>i.classList.remove('show'),1000); if(navigator.vibrate) navigator.vibrate(30); },
+      toggleFontScale() { this.fontScale=this.fontScale===1?1.3:1; document.documentElement.style.setProperty('--font-scale',this.fontScale); },
+      toggleHighContrast() {
+        this.highContrast=!this.highContrast;
+        const scr = document.querySelector('.screen');
+        scr.classList.toggle('hc-active',this.highContrast);
+        document.getElementById('hcToggle').classList.toggle('on',this.highContrast);
+        document.getElementById('hcModeSelector').classList.toggle('visible',this.highContrast);
+        if(this.highContrast && !this.hcMode) { this.setHighContrastMode(1); }
+        if(!this.highContrast) { scr.classList.remove('hc-mode-1','hc-mode-2','hc-mode-3','hc-mode-4'); }
+      },
+      setHighContrastMode(m) {
+        this.hcMode=m;
+        const scr = document.querySelector('.screen');
+        scr.classList.remove('hc-mode-1','hc-mode-2','hc-mode-3','hc-mode-4');
+        scr.classList.add('hc-mode-'+m);
+        document.querySelectorAll('.hc-mode-chip').forEach(c=>c.classList.toggle('active',parseInt(c.dataset.hcMode)===m));
+        if(this.hapticOn) this.triggerHaptic();
+      },
+      toggleDaltonism() { this.daltonism=!this.daltonism; document.querySelectorAll('.status-icon').forEach(e=>{ e.style.outline=e.style.outline||''; if(this.daltonism){ e.style.outline='2px solid var(--fg)'; e.style.outlineOffset='2px'; }else{ e.style.outline=''; e.style.outlineOffset=''; } }); },
+      escapeHtml(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+    };
+
+    document.addEventListener('DOMContentLoaded',()=>{
+      nakawe.initPatientSelector();
+      document.querySelectorAll('.scenario-toggle button').forEach(b=>b.addEventListener('click',()=>nakawe.setScenario(b.dataset.scenario)));
+      nakawe.updateContextSummary();
+      document.getElementById('msgInput').addEventListener('keydown',(e)=>{ if(e.key==='Enter'||e.keyCode===13) nakawe.sendMessage(); });
+    });
+  </script>
+</body>
+</html>
