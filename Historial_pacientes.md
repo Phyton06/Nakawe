@@ -13,16 +13,16 @@
 | **NSS** | 12 34 56 7890 |
 | **Tipo de sangre** | O+ |
 | **Alergias** | Penicilina (urticaria), Sulfamidas (erupción) |
-| **Vive con** | Sola (hija en USA — videollamada diaria) |
+| **Vive con** | Sola (hija en Estados Unidos — videollamada diaria) |
 | **Ocupación** | Jubilada — ex costurera (35 años) |
 | **Médico** | Dra. Laura Méndez |
 
 ### Condiciones Crónicas
-- **Diabetes tipo 2** (2016) — HbA1c 7.2% (mayo 2026) ⚠
-- **Hipertensión arterial** (2018) — PA 138/85
-- **Dislipidemia** (2019) — LDL 98, controlada
+- **Diabetes tipo 2** (desde 2016) — Hemoglobina glucosilada (HbA1c) 7.2% (mayo 2026) ⚠
+- **Hipertensión arterial** (desde 2018) — Presión arterial 138/85
+- **Colesterol alto (dislipidemia)** (desde 2019) — Colesterol LDL 98, controlada
 - **Neuropatía periférica incipiente** (en estudio — hormigueo en pies)
-- **Catarata bilateral** — OI pendiente de cirugía
+- **Catarata en ambos ojos** — Ojo izquierdo pendiente de cirugía
 
 ### Medicamentos
 | Medicamento | Horario | Activo |
@@ -30,25 +30,25 @@
 | Metformina 850 mg | 8:00 y 20:00 | ✅ |
 | Losartán 50 mg | 9:00 | ⏸ **Suspendido** (mareo) |
 | Atorvastatina 20 mg | 9:00 | ✅ |
-| Paracetamol 500 mg | PRN | ✅ |
+| Paracetamol 500 mg | Cuando sea necesario | ✅ |
 
 ### Cirugías
-- Colecistectomía laparoscópica (2015)
+- Colecistectomía laparoscópica (2015) — operación de la vesícula
 - Cesárea (1985)
 
 ### Hospitalizaciones Recientes
-- Descontrol glucémico (ene 2020) — 3 días
-- Infección urinaria (ago 2022) — 2 días
+- Descontrol de azúcar en sangre (enero 2020) — 3 días
+- Infección de vías urinarias (agosto 2022) — 2 días
 
 ### Familiares
-- Madre: fallecida (DM2 + HAS)
+- Madre: fallecida (diabetes tipo 2 + hipertensión arterial)
 - Padre: fallecido (cáncer de próstata)
-- Hermano: 72a, DM2
+- Hermano: 72 años, diabetes tipo 2
 
 ### Alertas Clave
-- ❗ Suspendió Losartán por mareo — autosuspendido sin consultar
-- ❗ HbA1c y microalbuminuria elevadas
-- ❗ Cirugía de catarata pendiente — hija no podrá acompañarla
+- ❗ Suspendió Losartán por mareo — lo dejó por su cuenta sin consultar al médico
+- ❗ Hemoglobina glucosilada (HbA1c) y microalbúmina en orina elevadas
+- ❗ Cirugía de catarata pendiente — su hija no podrá acompañarla
 
 ### Preguntas Sugeridas para Asistentes
 1. ¿Qué medicamentos debo tomar?
@@ -67,17 +67,17 @@
 | **Edad** | 72 años |
 | **NSS** | 98 76 54 3210 |
 | **Tipo de sangre** | A+ |
-| **Alergias** | Aspirina (angioedema leve) |
-| **Vive con** | Esposa Amelia. Hijo Juan (enfermero) cerca |
+| **Alergias** | Aspirina (hinchazón leve) |
+| **Vive con** | Su esposa Amelia. Su hijo Juan (enfermero) vive cerca |
 | **Ocupación** | Jubilado — ex albañil y velador |
 | **Médico** | Dr. Roberto García |
 
 ### Condiciones Crónicas
-- **Cardiopatía isquémica — IAM inferolateral** (2022) — Stent en CD
-- **EPOC leve GOLD 1** — VEF1 68%
-- **Hipertensión arterial** — PA 145/90 ⚠
-- **Dislipidemia mixta** — LDL 112, HDL 38
-- **Glucemia elevada** (156 mg/dL) — probable DM2 no diagnosticada
+- **Enfermedad de las arterias del corazón — Infarto en la pared inferior del corazón** (2022) — Le colocaron un stent (malla) en la arteria coronaria derecha
+- **Enfermedad Pulmonar Obstructiva Crónica (EPOC) leve** — Volumen espiratorio forzado (VEF1) 68%
+- **Hipertensión arterial** — Presión arterial 145/90 ⚠
+- **Colesterol alto mixto** — Colesterol LDL 112, Colesterol HDL 38
+- **Azúcar en sangre elevada** (156 mg/dL) — probable diabetes tipo 2 no diagnosticada
 
 ### Medicamentos
 | Medicamento | Horario | Activo |
@@ -85,25 +85,25 @@
 | Clopidogrel 75 mg | 10:00 | ✅ |
 | Atorvastatina 40 mg | 10:00 | ✅ |
 | Enalapril 10 mg | 10:00 y 22:00 | ✅ |
-| Salbutamol 100 mcg | PRN | ✅ |
+| Salbutamol inhalador 100 microgramos | Cuando sea necesario | ✅ |
 
 ### Procedimientos
-- Stent farmacoactivo en CD (jul 2022)
+- Stent (malla) en arteria coronaria derecha (julio 2022)
 - Rehabilitación cardíaca completada (2023) — asiste irregularmente
 
 ### Hospitalizaciones
-- IAM inferolateral con elevación ST (jul 2022) — 7 días
-- Neumonía adquirida (nov 2024) — 5 días
+- Infarto agudo de miocardio (julio 2022) — 7 días
+- Neumonía (noviembre 2024) — 5 días
 
 ### Familiares
-- Padre: fallecido 68a (infarto)
-- Madre: 88a, hipertensa
-- Hermano: 73a, bypass coronario
+- Padre: fallecido a los 68 años (infarto)
+- Madre: 88 años, hipertensa
+- Hermano: 73 años, bypass coronario
 
 ### Alertas Clave
-- ❗ Dolor torácico reportado (23 may) — breve, en paciente con IAM previo
-- ❗ Glucosa 156 mg/dL — posible DM2 no diagnosticada
-- ❗ SpO2 93% — limítrofe
+- ❗ Dolor en el pecho reportado (23 de mayo) — breve, pero en paciente con infarto previo
+- ❌ Azúcar en sangre 156 mg/dL — posible diabetes tipo 2 no diagnosticada
+- ❗ Nivel de oxígeno en sangre (SpO2) 93% — nivel limítrofe
 - ❗ Asiste irregularmente a rehabilitación cardíaca
 
 ### Preguntas Sugeridas para Asistentes
@@ -123,42 +123,42 @@
 | **Edad** | 65 años |
 | **NSS** | 45 67 89 0123 |
 | **Tipo de sangre** | B+ |
-| **Alergias** | Sulfonamidas (erupción generalizada) |
-| **Vive con** | Hija Lupita, yerno y dos nietos (8 y 5) |
+| **Alergias** | Sulfonamidas (erupción en la piel) |
+| **Vive con** | Su hija Lupita, su yerno y dos nietos (8 y 5 años) |
 | **Ocupación** | Jubilada — ex secretaria escolar |
 | **Médico** | Dra. Laura Méndez |
 
 ### Condiciones Crónicas
-- **Osteoartrosis generalizada**
-- **Osteoporosis severa** — T-score -2.8 cadera
-- **Reemplazo total de cadera derecha** (feb 2026) — 3 meses post-op
-- **IVU recurrente** — 3 episodios en 2025
+- **Desgaste de cartílago en varias articulaciones (osteoartrosis)**
+- **Pérdida severa de masa ósea (osteoporosis)** — Puntaje T -2.8 en cadera
+- **Reemplazo total de cadera derecha** (febrero 2026) — 3 meses después de la operación
+- **Infecciones de vías urinarias recurrentes** — 3 episodios en 2025
 
 ### Medicamentos
 | Medicamento | Horario | Activo |
 |-------------|---------|--------|
-| Ibuprofeno 400 mg | c/8h PRN | ✅ |
+| Ibuprofeno 400 mg | Cada 8 horas cuando sea necesario | ✅ |
 | Calcio + Vitamina D | 9:00 | ✅ |
-| Omeprazol 20 mg | 7:00 ayunas | ✅ |
-| Acetaminofén 500 mg | PRN | ✅ |
-| Cefalexina 500 mg | c/6h | ⏸ **Suspendido** (gastritis) |
+| Omeprazol 20 mg | 7:00 en ayunas | ✅ |
+| Acetaminofén 500 mg | Cuando sea necesario | ✅ |
+| Cefalexina 500 mg | Cada 6 horas | ⏸ **Suspendido** (ardor estomacal) |
 
 ### Cirugías
-- Reemplazo total de cadera derecha (10 feb 2026)
+- Reemplazo total de cadera derecha (10 febrero 2026)
 - Cesárea (1988)
 
 ### Hospitalizaciones
-- Cirugía de cadera (feb 2026) — 4 días
-- Pielonefritis aguda (mar 2025) — 5 días
+- Cirugía de cadera (febrero 2026) — 4 días
+- Infección grave de riñón (pielonefritis, marzo 2025) — 5 días
 
 ### Familiares
-- Madre: fallecida 74a (fractura de cadera)
-- Padre: fallecido 76a (ACV)
+- Madre: fallecida a los 74 años (fractura de cadera)
+- Padre: fallecido a los 76 años (derrame cerebral)
 
 ### Alertas Clave
-- ❗ Suspendió Cefalexina (tomó 3/7 días) — riesgo de resistencia
-- ❗ Dolor post-quirúrgico persistente (EVA 4/10 a 3 meses)
-- ❗ Insomnio desde la cirugía
+- ❗ Suspendió la Cefalexina (solo tomó 3 de 7 días) — riesgo de resistencia al antibiótico
+- ❗ Dolor después de la cirugía que no se quita (Escala de dolor 4/10 a 3 meses de la operación)
+- ❗ No puede dormir desde la cirugía
 - ❗ Siente que es "una carga" para su hija
 
 ### Preguntas Sugeridas para Asistentes
@@ -179,22 +179,22 @@
 | **NSS** | 32 10 98 7654 |
 | **Tipo de sangre** | O+ |
 | **Alergias** | Ninguna conocida |
-| **Vive con** | Esposa Rosa (68). Dos hijas en la misma ciudad |
+| **Vive con** | Su esposa Rosa (68 años). Dos hijas en la misma ciudad |
 | **Ocupación** | Jubilado — ex contador público (38 años) |
 | **Médico** | Dr. Roberto García |
 
 ### Condiciones
-- **Asma bronquial leve intermitente** — Salbutamol 1-2×/mes
-- **Hipertensión limítrofe** (prehipertensión) — PA 132/85 sin fármacos
-- **Hipercolesterolemia leve** — LDL 145, HDL 38 ⚠
-- **SAOS leve** — CPAP 3h/noche (debería 7-8h)
-- **Ansiedad por salud** (hipocondría digital)
+- **Asma bronquial leve** — Usa Salbutamol 1 a 2 veces al mes
+- **Presión arterial límite (prehipertensión)** — Presión arterial 132/85 sin medicamentos
+- **Colesterol alto leve** — Colesterol LDL 145, Colesterol HDL 38 ⚠
+- **Apnea del sueño leve** — Usa máquina CPAP 3 horas por noche (debería usarla 7 a 8 horas)
+- **Ansiedad por su salud** (investiga demasiado en internet)
 
 ### Medicamentos
 | Medicamento | Horario | Activo |
 |-------------|---------|--------|
-| Salbutamol 100 mcg | PRN | ✅ |
-| CPAP 8 cmH₂O | Noche | ✅ (uso parcial) |
+| Salbutamol inhalador 100 microgramos | Cuando sea necesario | ✅ |
+| Máquina CPAP (presión positiva para dormir) | Noche | ✅ (uso parcial) |
 | Multivitamínico | 9:00 | ✅ |
 
 ### Cirugías
@@ -204,15 +204,15 @@ Ninguna
 Ninguna
 
 ### Familiares
-- Padre: fallecido 70a (infarto)
-- Madre: 92a, hipertensa
-- Hermana: 73a, cáncer de mama (superviviente)
+- Padre: fallecido a los 70 años (infarto)
+- Madre: 92 años, hipertensa
+- Hermana: 73 años, cáncer de mama (superviviente)
 
 ### Alertas Clave
-- ❗ Primer check-up en 10 años — sin datos basales previos
-- ❗ LDL 145 + HDL 38 — riesgo cardiovascular
-- ❗ Mala adherencia a CPAP
-- ❗ Hipocondría digital — puede generar ansiedad innecesaria
+- ❗ Primer chequeo general en 10 años — no tenía estudios anteriores para comparar
+- ❗ Colesterol LDL 145 + Colesterol HDL 38 — riesgo de enfermedad del corazón
+- ❗ Usa mal la máquina CPAP (solo 3 horas cuando deberían ser 7-8)
+- ❗ Ansiedad por investigar síntomas en internet
 
 ### Preguntas Sugeridas para Asistentes
 1. ¿Qué me salió en los estudios?
