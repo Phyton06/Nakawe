@@ -1,8 +1,8 @@
 /* Nakawe Service Worker — ExpoCiencias 2026 */
 
-const CACHE = 'nakawe-v2';
+const CACHE = 'nakawe-v4';
+// index.html NO se precarga — se sirve con network-first siempre fresco
 const ASSETS = [
-  'index.html',
   'manifest.json',
   'assets/images/logo.png',
   'assets/images/luz.png',
