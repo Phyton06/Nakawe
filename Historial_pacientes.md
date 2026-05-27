@@ -5,7 +5,7 @@
 
 ---
 
-## 🧑‍🦰 María Rodríguez — "La que vive sola"
+## 🧑‍🦰 María Rodríguez
 
 | Campo | Detalle |
 |-------|---------|
@@ -50,15 +50,17 @@
 - ❗ HbA1c y microalbuminuria elevadas
 - ❗ Cirugía de catarata pendiente — hija no podrá acompañarla
 
-### Preguntas Sugeridas
-1. ¿Cómo has sentido el hormigueo en los pies?
-2. ¿Has vuelto a tomar Losartán?
-3. ¿Qué has estado comiendo esta semana?
-4. ¿Cómo te sientes con la operación de la vista?
+### Preguntas Sugeridas para Asistentes
+1. ¿Qué medicamentos toma María?
+2. ¿Por qué suspendió el Losartán?
+3. ¿Cómo está su diabetes?
+4. ¿Cuándo es su cirugía de catarata?
+5. ¿Qué síntomas tiene en los pies?
+6. ¿Vive sola o acompañada?
 
 ---
 
-## 👨‍🦰 Pedro Hernández — "El del corazón"
+## 👨‍🦰 Pedro Hernández
 
 | Campo | Detalle |
 |-------|---------|
@@ -94,7 +96,7 @@
 - Neumonía adquirida (nov 2024) — 5 días
 
 ### Familiares
-- Padre: fallecido 68a (infarto) — **su mayor miedo**
+- Padre: fallecido 68a (infarto)
 - Madre: 88a, hipertensa
 - Hermano: 73a, bypass coronario
 
@@ -104,15 +106,17 @@
 - ❗ SpO2 93% — limítrofe
 - ❗ Asiste irregularmente a rehabilitación cardíaca
 
-### Preguntas Sugeridas
-1. ¿Cómo ha estado el dolor en el pecho?
-2. ¿Sigues yendo a rehabilitación cardíaca?
-3. ¿Cómo duermes?
-4. ¿Has notado falta de aire al caminar?
+### Preguntas Sugeridas para Asistentes
+1. ¿Qué problema del corazón tiene Pedro?
+2. ¿Qué medicamentos toma para el corazón?
+3. ¿Por qué le preocupa tanto su salud?
+4. ¿Qué otros problemas de salud tiene además del corazón?
+5. ¿Tiene algún síntoma actualmente?
+6. ¿Por qué dejó de fumar?
 
 ---
 
-## 👩 Carmen López — "La de la cadera nueva"
+## 👩 Carmen López
 
 | Campo | Detalle |
 |-------|---------|
@@ -148,7 +152,7 @@
 - Pielonefritis aguda (mar 2025) — 5 días
 
 ### Familiares
-- Madre: fallecida 74a (fractura de cadera — **trauma personal**)
+- Madre: fallecida 74a (fractura de cadera)
 - Padre: fallecido 76a (ACV)
 
 ### Alertas Clave
@@ -157,15 +161,17 @@
 - ❗ Insomnio desde la cirugía
 - ❗ Siente que es "una carga" para su hija
 
-### Preguntas Sugeridas
-1. ¿Cómo va la recuperación de la cadera?
-2. ¿Has podido dormir mejor?
-3. ¿Sigues con molestias del estómago?
-4. ¿Cómo te sientes emocionalmente?
+### Preguntas Sugeridas para Asistentes
+1. ¿Qué cirugía le hicieron a Carmen?
+2. ¿Por qué suspendió el antibiótico?
+3. ¿Cómo va su recuperación?
+4. ¿Qué medicamentos toma para los huesos?
+5. ¿Por qué es importante su caso de osteoporosis?
+6. ¿Cómo se siente emocionalmente?
 
 ---
 
-## 👨 José Martínez — "El recién jubilado"
+## 👨 José Martínez
 
 | Campo | Detalle |
 |-------|---------|
@@ -198,7 +204,7 @@ Ninguna
 Ninguna
 
 ### Familiares
-- Padre: fallecido 70a (infarto) — **misma edad de José**
+- Padre: fallecido 70a (infarto)
 - Madre: 92a, hipertensa
 - Hermana: 73a, cáncer de mama (superviviente)
 
@@ -208,11 +214,13 @@ Ninguna
 - ❗ Mala adherencia a CPAP
 - ❗ Hipocondría digital — puede generar ansiedad innecesaria
 
-### Preguntas Sugeridas
-1. ¿Cómo te ha ido en la jubilación?
-2. ¿Has tenido alguna molestia o síntoma?
-3. ¿Cómo va con el CPAP por las noches?
-4. ¿Qué has leído o investigado sobre tu salud?
+### Preguntas Sugeridas para Asistentes
+1. ¿Por qué José está preocupado por su salud?
+2. ¿Qué le detectaron en sus estudios?
+3. ¿Tiene algún tratamiento médico?
+4. ¿Por qué usa un CPAP?
+5. ¿Qué es la "hipocondría digital"?
+6. ¿Cuál es su mayor miedo respecto a su salud?
 
 ---
 
