@@ -1429,8 +1429,8 @@ ${alertStr ? '\nALERTAS:\n' + alertStr : ''}`;
             const data = await res.json();
             const t1 = performance.now();
             console.log(`TTS [${model}]: respuesta en ${(t1-t0).toFixed(0)}ms`);
-            // Si colgaron mientras se generaba, no reproducimos
-            if (!this.voiceModeActive) { done = true; clearTimeout(timeout); return; }
+            // Si colgaron la llamada mientras se generaba, no procesamos el audio
+            if (!this.voiceModeActive && this.waitingForLuz) { clearTimeout(timeout); return; }
             const part = data.candidates?.[0]?.content?.parts?.[0];
             if (part?.inlineData?.data) {
               console.log(`TTS [${model}]: inlineData recibido (${part.inlineData.data.length} chars)`);
