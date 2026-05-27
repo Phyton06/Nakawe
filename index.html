@@ -605,6 +605,9 @@
     .voice-preview-btn { background: none; border: 1px solid var(--border); border-radius: 10px; padding: 6px 10px; cursor: pointer; color: var(--muted); font-size: 14px; display: flex; align-items: center; gap: 4px; margin-left: 6px; flex-shrink: 0; transition: border-color 0.2s, color 0.2s; }
     .voice-preview-btn:active { transform: scale(0.95); }
     .voice-preview-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .audio-dot { display: inline-block; margin-left: 8px; font-size: 14px; animation: audioPulse 1s ease-in-out infinite; vertical-align: middle; }
+    @keyframes audioPulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+    .hc-active .audio-dot { filter: brightness(1.5) !important; }
     .hc-mode-chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
     .hc-mode-chip {
       display: flex; flex-direction: column; align-items: center; gap: 4px;
@@ -1267,9 +1270,18 @@ ${alertStr ? '\nALERTAS:\n' + alertStr : ''}`;
       },
       scrollChat() { const c = document.getElementById('chatArea'); if(c) c.scrollTop = c.scrollHeight; },
 
-      // Gemini native TTS — voz natural, nada de browser SpeechSynthesis robótico
+      // Gemini native TTS — voz natural
       async generateSpeech(text) {
         if (this.muted) return;
+        this.showAudioIndicator(true);
+        const t0 = performance.now();
+        let timedOut = false;
+        const timeout = setTimeout(() => {
+          timedOut = true;
+          this.showAudioIndicator(false);
+          console.warn('TTS timeout (>15s), cayendo a SpeechSynthesis');
+          this.fallbackSpeak(text);
+        }, 15000);
         try {
           const res = await fetch(
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-tts-preview:generateContent?key=${GEMINI_API_KEY}`,
@@ -1289,20 +1301,42 @@ ${alertStr ? '\nALERTAS:\n' + alertStr : ''}`;
               })
             }
           );
+          if (timedOut) return;
           if (!res.ok) throw new Error(`TTS API error: ${res.status}`);
           const data = await res.json();
+          const t1 = performance.now();
+          console.log(`TTS: respuesta en ${(t1-t0).toFixed(0)}ms`);
           const part = data.candidates?.[0]?.content?.parts?.[0];
           if (part?.inlineData?.data) {
             const pcmBytes = this.base64ToBytes(part.inlineData.data);
             const wav = this.pcmToWav(pcmBytes, 24000);
             const blob = new Blob([wav], { type: 'audio/wav' });
+            clearTimeout(timeout);
+            this.showAudioIndicator(false);
             if (this.currentAudio) { this.currentAudio.pause(); this.currentAudio = null; }
             this.currentAudio = new Audio(URL.createObjectURL(blob));
             this.currentAudio.play();
+            const t2 = performance.now();
+            console.log(`TTS: audio listo en ${(t2-t0).toFixed(0)}ms`);
           }
         } catch (err) {
-          console.warn('TTS no disponible, cayendo a SpeechSynthesis:', err);
-          this.fallbackSpeak(text);
+          clearTimeout(timeout);
+          this.showAudioIndicator(false);
+          if (!timedOut) {
+            console.warn('TTS no disponible, cayendo a SpeechSynthesis:', err);
+            this.fallbackSpeak(text);
+          }
+        }
+      },
+      showAudioIndicator(show) {
+        const bubbles = document.querySelectorAll('.bubble.luz');
+        const last = bubbles[bubbles.length - 1];
+        if (!last) return;
+        let dot = last.querySelector('.audio-dot');
+        if (show) {
+          if (!dot) { dot = document.createElement('span'); dot.className = 'audio-dot'; dot.textContent = '🔊'; last.querySelector('.bubble-header')?.after(dot); }
+        } else {
+          if (dot) dot.remove();
         }
       },
       fallbackSpeak(text) {
