@@ -1069,7 +1069,7 @@ REGLAS:
 - Trata al paciente con respeto e inteligencia
 - Respuestas cortas (2-3 oraciones como máximo), con un tono natural y cálido
 - Valida emociones sin exagerar
-- NUNCA diagnostiques ni recetes — si algo es grave, decí "Eso es mejor consultarlo con tu médico"
+- NUNCA diagnostiques ni recetes — si algo es grave, dile "Eso es mejor consultarlo con tu médico"
 
 PACIENTE ACTUAL:
 - Nombre: ${p.nombre}
@@ -1078,12 +1078,12 @@ PACIENTE ACTUAL:
 - Médico: ${p.medico}
 - Escenario: ${scenario === 'clinic' ? 'En la clínica, esperando consulta' : 'En casa, después de la consulta'}
 
-Respondé como si lo conocieras de toda la vida, con confianza y calidez. Siempre en español.`;
+Responde como si lo conocieras de toda la vida, con confianza y calidez. Siempre en español mexicano.`;
       },
 
       async queryGemini(text) {
         if (!GEMINI_API_KEY || GEMINI_API_KEY === 'tu-api-key-de-gemini') {
-          const fallback = 'Uy, parece que necesito que me activen primero. Decile al equipo de Nakawe que configuren mi API key y al instante estoy lista.';
+          const fallback = 'Uy, parece que necesito que me activen primero. Dile al equipo de Nakawe que configuren mi API key y al instante estoy lista.';
           this.addChat('luz', fallback);
           this.setCaption('LUZ', fallback, true);
           if(!this.muted) this.speak(fallback);
@@ -1102,7 +1102,7 @@ Respondé como si lo conocieras de toda la vida, con confianza y calidez. Siempr
 
         try {
           const res = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
             {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -1135,7 +1135,7 @@ Respondé como si lo conocieras de toda la vida, con confianza y calidez. Siempr
 
         } catch (err) {
           console.error('Gemini error:', err);
-          const errorMsg = 'Disculpa, tuve un problema para responder. ¿Podés intentar de nuevo?';
+          const errorMsg = 'Disculpa, tuve un problema para responder. ¿Puedes intentar de nuevo?';
           this.addChat('luz', errorMsg);
           this.setCaption('LUZ', errorMsg, true);
           if(!this.muted) this.speak(errorMsg);
