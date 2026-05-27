@@ -25,12 +25,12 @@ El navegador te va a ofrecer instalar la app en tu pantalla de inicio.
 
 ## Pacientes
 
-| # | Nombre | Edad | Apodo | Consultorio | Médico |
-|---|--------|------|-------|-------------|--------|
-| 1 | **María Rodríguez** | 68 | La que vive sola | 4 | Dra. Laura Méndez |
-| 2 | **Pedro Hernández** | 72 | El del corazón | 2 | Dr. Roberto García |
-| 3 | **Carmen López** | 65 | La de la cadera nueva | 1 | Dra. Laura Méndez |
-| 4 | **José Martínez** | 70 | El recién jubilado | 3 | Dr. Roberto García |
+| # | Nombre | Edad | Consultorio | Médico |
+|---|--------|------|-------------|--------|
+| 1 | **María Rodríguez** | 68 | 4 | Dra. Laura Méndez |
+| 2 | **Pedro Hernández** | 72 | 2 | Dr. Roberto García |
+| 3 | **Carmen López** | 65 | 1 | Dra. Laura Méndez |
+| 4 | **José Martínez** | 70 | 3 | Dr. Roberto García |
 
 ### Resumen Clínico
 
