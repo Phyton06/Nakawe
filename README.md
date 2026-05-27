@@ -22,3 +22,34 @@ El navegador te va a ofrecer instalar la app en tu pantalla de inicio.
 - **Tipografía**: Iowan Old Style (display), SF Pro Text (UI)
 - **Iconos**: SVG inline
 - **Assets**: PNG / JPEG en `assets/images/`
+
+## Pacientes
+
+| # | Nombre | Edad | Apodo | Consultorio | Médico |
+|---|--------|------|-------|-------------|--------|
+| 1 | **María Rodríguez** | 68 | La que vive sola | 4 | Dra. Laura Méndez |
+| 2 | **Pedro Hernández** | 72 | El del corazón | 2 | Dr. Roberto García |
+| 3 | **Carmen López** | 65 | La de la cadera nueva | 1 | Dra. Laura Méndez |
+| 4 | **José Martínez** | 70 | El recién jubilado | 3 | Dr. Roberto García |
+
+### Resumen Clínico
+
+- **María**: DM2 + HAS + neuropatía periférica. Suspendió Losartán por mareo. HbA1c 7.2%.
+- **Pedro**: Cardiopatía isquémica (stent 2022) + EPOC. Reportó dolor torácico breve. Glucosa 156 mg/dL.
+- **Carmen**: RTC cadera derecha (feb 2026) + osteoporosis. Suspendió antibiótico por gastritis. Adherencia 72%.
+- **José**: Recién jubilado. Primer check-up en 10 años. LDL 145. SAOS leve + hipocondría digital.
+
+### Data de Pacientes
+
+Los perfiles completos de los pacientes (condiciones crónicas, medicamentos, cirugías, hospitalizaciones, antecedentes familiares, estudios, signos vitales y alertas) se definen en `js/pacientes.js`, que es cargado por `index.html`, `doctor.html` y `triage.html`. Este archivo alimenta el **system prompt de LUZ** y el dashboard médico con contexto clínico detallado.
+
+El documento `Historial_pacientes.md` contiene los resúmenes completos para impresión en lonas/carteles.
+
+## Data
+
+| Archivo | Propósito |
+|---------|-----------|
+| `js/pacientes.js` | Perfiles completos de los 4 pacientes (compartido) |
+| `js/gemini-config.js` | API key de Gemini (gitignored) |
+| `js/gemini-config.example.js` | Template de configuración |
+| `Historial_pacientes.md` | Resúmenes para impresión en lonas |

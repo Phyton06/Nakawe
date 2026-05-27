@@ -944,13 +944,8 @@
   <div class="haptic-indicator" id="hapticIndicator">Vibración</div>
 
   <script src="js/gemini-config.js"></script>
+  <script src="js/pacientes.js"></script>
   <script>
-    const PACIENTES = [
-      { id:1, nombre:'María Rodríguez', edad:68, consultorio:4, iniciales:'MR', avatarBg:'oklch(60% 0.14 145)', nss:'12 34 56 7890', tipoSangre:'O+', alergias:'Penicilina', medico:'Dra. Laura Méndez', proxCita:'12 jun 2026' },
-      { id:2, nombre:'Pedro Hernández', edad:72, consultorio:2, iniciales:'PH', avatarBg:'oklch(58% 0.12 240)', nss:'98 76 54 3210', tipoSangre:'A+', alergias:'Aspirina', medico:'Dr. Roberto García', proxCita:'19 jun 2026' },
-      { id:3, nombre:'Carmen López', edad:65, consultorio:1, iniciales:'CL', avatarBg:'oklch(64% 0.13 85)', nss:'45 67 89 0123', tipoSangre:'B+', alergias:'Sulfa', medico:'Dra. Laura Méndez', proxCita:'5 jun 2026' },
-      { id:4, nombre:'José Martínez', edad:70, consultorio:3, iniciales:'JM', avatarBg:'oklch(58% 0.14 30)', nss:'32 10 98 7654', tipoSangre:'O+', alergias:'Ninguna', medico:'Dr. Roberto García', proxCita:'26 jun 2026' }
-    ];
 
     const nakawe = {
       currentScreen:'login', activePatient:null, micListening:false, voiceModeActive:false,
@@ -1061,6 +1056,87 @@
       buildSystemPrompt() {
         const p = this.activePatient || PACIENTES[0];
         const scenario = this.scenario;
+        const s = scenario === 'clinic' ? 'En la clínica, esperando consulta' : 'En casa, después de la consulta';
+
+        // Condiciones crónicas
+        let condStr = '';
+        if (p.condiciones && p.condiciones.length) {
+          condStr = p.condiciones.map(c => {
+            const control = c.controlada === true ? '✓ Controlada' : c.controlada === 'parcialmente' ? '◐ Parcialmente controlada' : '✗ Sin control';
+            const reg = c.ultimoRegistro ? ` — ${c.ultimoRegistro}` : '';
+            return `• ${c.nombre} (desde ${c.diagnosticada})${reg} · ${control}`;
+          }).join('\n');
+        }
+
+        // Medicamentos activos
+        let medStr = '';
+        const activos = (p.medicamentos || []).filter(m => m.activo);
+        if (activos.length) {
+          medStr = activos.map(m => {
+            const freq = m.frecuencia ? ` · ${m.frecuencia}` : '';
+            const hor = m.horario ? ` · ${m.horario}` : '';
+            const notas = m.notas ? ` — ${m.notas}` : '';
+            return `• ${m.nombre}${freq}${hor}${notas}`;
+          }).join('\n');
+        }
+
+        // Medicamentos suspendidos
+        let suspStr = '';
+        const suspendidos = (p.medicamentos || []).filter(m => !m.activo);
+        if (suspendidos.length) {
+          suspStr = 'MEDICAMENTOS SUSPENDIDOS:\n' + suspendidos.map(m =>
+            `• ${m.nombre} — ${m.motivoSuspension || 'Suspendido'}`
+          ).join('\n');
+        }
+
+        // Cirugías
+        let cirStr = '';
+        if (p.cirugias && p.cirugias.length) {
+          cirStr = p.cirugias.map(c =>
+            `• ${c.procedimiento} (${c.fecha})`
+          ).join('\n');
+        }
+
+        // Hospitalizaciones
+        let hospStr = '';
+        if (p.hospitalizaciones && p.hospitalizaciones.length) {
+          hospStr = p.hospitalizaciones.map(h =>
+            `• ${h.motivo} — ${h.fecha} (${h.duracion})`
+          ).join('\n');
+        }
+
+        // Antecedentes familiares
+        let famStr = '';
+        if (p.familiares && p.familiares.length) {
+          famStr = p.familiares.map(f =>
+            `• ${f.parentesco}: ${f.condiciones.join(', ')}${f.fallecio ? ' (fallecido)' : ' (vivo)'}`
+          ).join('\n');
+        }
+
+        // Estudios recientes pendientes
+        let estStr = '';
+        if (p.estudios && p.estudios.length) {
+          const recientes = p.estudios.filter(e => !e.pendiente).slice(0, 5);
+          if (recientes.length) {
+            estStr = recientes.map(e => {
+              const alerta = e.resultado && e.rangoNormal && e.resultado.includes('elevado') ? ' ⚠' : '';
+              return `• ${e.nombre}: ${e.resultado || '—'} (${e.fecha})${alerta}`;
+            }).join('\n');
+          }
+        }
+
+        // Síntomas
+        let sintStr = '';
+        if (p.sintomas && p.sintomas.length) {
+          sintStr = p.sintomas.map(s => `• ${s}`).join('\n');
+        }
+
+        // Alertas
+        let alertStr = '';
+        if (p.alertas && p.alertas.length) {
+          alertStr = p.alertas.slice(0, 4).map(a => `• ⚠ ${a}`).join('\n');
+        }
+
         return `Eres LUZ, una asistente de salud que habla con el cariño de una tía o hija mexicana.
 
 REGLAS:
@@ -1070,13 +1146,30 @@ REGLAS:
 - Respuestas cortas (2-3 oraciones como máximo), con un tono natural y cálido
 - Valida emociones sin exagerar
 - NUNCA diagnostiques ni recetes — si algo es grave, dile "Eso es mejor consultarlo con tu médico"
+- Sé honesta pero amable. Si el paciente dejó un medicamento, no lo regañes, entiende por qué y anímalo a hablarlo con su médico.
+- Usa los datos de contexto para personalizar tus respuestas, pero no los recite todos de golpe.
 
 PACIENTE ACTUAL:
 - Nombre: ${p.nombre}
 - Edad: ${p.edad} años
+- Vive: ${p.viveCon || 'Sin información'}
+- Ocupación: ${p.ocupacion || 'Sin información'}
+- Personalidad: ${p.personalidad || ''}
 - Alergias: ${p.alergias || 'Ninguna conocida'}
+- Tipo de sangre: ${p.tipoSangre || '—'}
 - Médico: ${p.medico}
-- Escenario: ${scenario === 'clinic' ? 'En la clínica, esperando consulta' : 'En casa, después de la consulta'}
+- Próxima cita: ${p.proxCita || '—'}
+- Escenario: ${s}
+
+${condStr ? 'CONDICIONES CRÓNICAS:\n' + condStr : ''}
+${medStr ? '\nMEDICAMENTOS ACTIVOS:\n' + medStr : ''}
+${suspStr ? '\n' + suspStr : ''}
+${cirStr ? '\nCIRUGÍAS:\n' + cirStr : ''}
+${hospStr ? '\nHOSPITALIZACIONES RECIENTES:\n' + hospStr : ''}
+${famStr ? '\nANTECEDENTES FAMILIARES:\n' + famStr : ''}
+${estStr ? '\nESTUDIOS RECIENTES:\n' + estStr : ''}
+${sintStr ? '\nSÍNTOMAS REPORTADOS:\n' + sintStr : ''}
+${alertStr ? '\nALERTAS:\n' + alertStr : ''}
 
 Responde como si lo conocieras de toda la vida, con confianza y calidez. Siempre en español mexicano.`;
       },
