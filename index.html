@@ -943,6 +943,7 @@
   </div>
   <div class="haptic-indicator" id="hapticIndicator">Vibración</div>
 
+  <script src="js/gemini-config.js"></script>
   <script>
     const PACIENTES = [
       { id:1, nombre:'María Rodríguez', edad:68, consultorio:4, iniciales:'MR', avatarBg:'oklch(60% 0.14 145)', nss:'12 34 56 7890', tipoSangre:'O+', alergias:'Penicilina', medico:'Dra. Laura Méndez', proxCita:'12 jun 2026' },
@@ -955,6 +956,7 @@
       currentScreen:'login', activePatient:null, micListening:false, voiceModeActive:false,
       recognition:null, synth:window.speechSynthesis, muted:false, hapticOn:true,
       scenario:'clinic', fontScale:1, highContrast:false, hcMode:null, daltonism:false,
+      chatHistory:[],
 
       initPatientSelector() {
         document.getElementById('patientGrid').innerHTML = PACIENTES.map(p =>
@@ -1029,14 +1031,14 @@
           const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
           this.recognition = new SR(); this.recognition.lang='es-MX'; this.recognition.continuous=false; this.recognition.interimResults=true;
           this.recognition.onresult = (e) => {
-            let t=''; for(let i=e.resultIndex;i<e.results.length;i++){ t+=e.results[i][0].transcript; if(e.results[i].isFinal){ this.addChat('user',t); this.processQuery(t); this.setCaption('Tú',t,true); this.stopListening(); return; } }
+            let t=''; for(let i=e.resultIndex;i<e.results.length;i++){ t+=e.results[i][0].transcript; if(e.results[i].isFinal){ this.addChat('user',t); this.queryGemini(t); this.setCaption('Tú',t,true); this.stopListening(); return; } }
             if(t) this.setCaption('Tú',t+'…',false);
           };
           this.recognition.onerror = () => { this.addChat('luz','No te escuché bien. ¿Puedes repetirlo?'); this.setCaption('LUZ','No te escuché bien. ¿Puedes repetirlo?',true); this.stopListening(); };
           this.recognition.start();
         } else {
           this.setCaption('LUZ','Escuchando…',false);
-          setTimeout(()=>{ const m='Me duele un poco la cabeza'; this.setCaption('Tú',m,true); this.addChat('user',m); this.processQuery(m); this.stopListening(); },2000);
+          setTimeout(()=>{ const m='Me duele un poco la cabeza'; this.setCaption('Tú',m,true); this.addChat('user',m); this.queryGemini(m); this.stopListening(); },2000);
         }
       },
 
@@ -1056,15 +1058,88 @@
         if(isFinal && sp==='LUZ'){ document.getElementById('orbLabel').textContent='Respondido'; setTimeout(()=>{ if(this.voiceModeActive) document.getElementById('orbLabel').textContent='Esperando…'; },1000); }
       },
 
-      processQuery(text) {
-        const l = text.toLowerCase();
-        let r = '';
-        if(l.includes('duele')||l.includes('dolor')||l.includes('cabeza')||l.includes('mal')) r='Veo que tienes molestias. ¿Quieres que te recuerde tomar algo para el dolor o prefieres hablar con tu médico?';
-        else if(l.includes('medicina')||l.includes('medicamento')||l.includes('tomar')||l.includes('pastilla')) r='Tu próxima dosis es Paracetamol 500 mg a las 8:00 PM. ¿Ya te lo tomaste?';
-        else if(l.includes('cita')||l.includes('doctor')||l.includes('médico')||l.includes('consulta')) r='Tu próxima cita es el 12 de junio con la Dra. Laura Méndez. ¿Quieres que te recuerde un día antes?';
-        else if(l.includes('gracias')||l.includes('ok')||l.includes('bien')) r='Para eso estoy. Si necesitas algo más, aquí me tienes.';
-        else r='Entendido. Estoy aquí para ayudarte con tus medicamentos, citas, o cualquier duda de salud. ¿Qué más necesitas?';
-        setTimeout(()=>{ this.addChat('luz',r); this.setCaption('LUZ',r,true); if(!this.muted) this.speak(r); if(this.hapticOn) this.triggerHaptic(); },800);
+      buildSystemPrompt() {
+        const p = this.activePatient || PACIENTES[0];
+        const scenario = this.scenario;
+        return `Eres LUZ, una asistente de salud que habla con el cariño de una tía o hija mexicana.
+
+REGLAS:
+- Explica términos médicos en lenguaje sencillo y claro, como si hablaras con alguien de tu familia
+- NO uses analogías forzadas — solo si de verdad aclaran algo complejo
+- Trata al paciente con respeto e inteligencia
+- Respuestas cortas (2-3 oraciones como máximo), con un tono natural y cálido
+- Valida emociones sin exagerar
+- NUNCA diagnostiques ni recetes — si algo es grave, decí "Eso es mejor consultarlo con tu médico"
+
+PACIENTE ACTUAL:
+- Nombre: ${p.nombre}
+- Edad: ${p.edad} años
+- Alergias: ${p.alergias || 'Ninguna conocida'}
+- Médico: ${p.medico}
+- Escenario: ${scenario === 'clinic' ? 'En la clínica, esperando consulta' : 'En casa, después de la consulta'}
+
+Respondé como si lo conocieras de toda la vida, con confianza y calidez. Siempre en español.`;
+      },
+
+      async queryGemini(text) {
+        if (!GEMINI_API_KEY || GEMINI_API_KEY === 'tu-api-key-de-gemini') {
+          const fallback = 'Uy, parece que necesito que me activen primero. Decile al equipo de Nakawe que configuren mi API key y al instante estoy lista.';
+          this.addChat('luz', fallback);
+          this.setCaption('LUZ', fallback, true);
+          if(!this.muted) this.speak(fallback);
+          return;
+        }
+
+        const systemPrompt = this.buildSystemPrompt();
+
+        const contents = [
+          ...this.chatHistory.slice(-20).map(msg => ({
+            role: msg.role === 'luz' ? 'model' : 'user',
+            parts: [{ text: msg.text }]
+          })),
+          { role: 'user', parts: [{ text }] }
+        ];
+
+        try {
+          const res = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                system_instruction: { parts: [{ text: systemPrompt }] },
+                contents,
+                generationConfig: {
+                  temperature: 0.7,
+                  maxOutputTokens: 300
+                }
+              })
+            }
+          );
+
+          if (!res.ok) {
+            throw new Error(`API error: ${res.status}`);
+          }
+
+          const data = await res.json();
+          const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+          if (!reply) {
+            throw new Error('Respuesta vacía de la IA');
+          }
+
+          this.addChat('luz', reply);
+          this.setCaption('LUZ', reply, true);
+          if(!this.muted) this.speak(reply);
+          if(this.hapticOn) this.triggerHaptic();
+
+        } catch (err) {
+          console.error('Gemini error:', err);
+          const errorMsg = 'Disculpa, tuve un problema para responder. ¿Podés intentar de nuevo?';
+          this.addChat('luz', errorMsg);
+          this.setCaption('LUZ', errorMsg, true);
+          if(!this.muted) this.speak(errorMsg);
+        }
       },
 
       addChat(role,text) {
@@ -1073,6 +1148,7 @@
         if(role==='luz') b.innerHTML='<div class="bubble-header"><span class="luz-mini"><img class="luz-img" src="./assets/images/luz.png" alt="LUZ"></span><span class="luz-label">LUZ</span></div>'+this.escapeHtml(text);
         else b.textContent=text;
         c.appendChild(b); this.scrollChat();
+        this.chatHistory.push({ role, text });
       },
 
       sendMessage() {
@@ -1081,7 +1157,7 @@
         if (!text) return;
         inp.value = '';
         this.addChat('user', text);
-        this.processQuery(text);
+        this.queryGemini(text);
         if (this.hapticOn) this.triggerHaptic();
       },
       scrollChat() { const c = document.getElementById('chatArea'); if(c) c.scrollTop = c.scrollHeight; },
