@@ -1273,7 +1273,7 @@
       },
 
       _genOneAudio(text, filename, done) {
-        if (!window.GEMINI_API_KEY || GEMINI_API_KEY === 'tu-api-key-de-gemini') {
+        if (typeof GEMINI_API_KEY === 'undefined' || GEMINI_API_KEY === 'tu-api-key-de-gemini') {
           document.getElementById('genAudioStatus').textContent = '❌ No hay API key configurada';
           return;
         }
