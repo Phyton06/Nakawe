@@ -6,9 +6,31 @@ Last updated: 2026-05-27
 
 ## Sources scanned
 
-- /home/phyton/.config/opencode/skills
-- /home/phyton/.claude/skills
-- /home/phyton/.codex/skills
+### User-level
+- /home/phyton/.config/opencode/skills (primary — 35 skills)
+- /home/phyton/.claude/skills (clone — same 35 skills)
+- /home/phyton/.codex/skills (subset — 22 skills, no angular, ai-sdk, django, github, nextjs, playwright, pytest, react, tailwind, typescript, zod, zustand)
+
+### Project-level (none found)
+- /var/home/phyton/nakawe/skills — MISS
+- /var/home/phyton/nakawe/.opencode/skills — MISS
+- /var/home/phyton/nakawe/.claude/skills — MISS
+- /var/home/phyton/nakawe/.cursor/skills — MISS
+- /var/home/phyton/nakawe/.github/skills — MISS
+- /var/home/phyton/nakawe/.codex/skills — MISS
+- /var/home/phyton/nakawe/.qwen/skills — MISS
+- /var/home/phyton/nakawe/.gemini/skills — MISS
+- /var/home/phyton/nakawe/.kiro/skills — MISS
+- /var/home/phyton/nakawe/.openclaw/skills — MISS
+- /var/home/phyton/nakawe/.pi/skills — MISS
+- /var/home/phyton/nakawe/.agent/skills — MISS
+- /var/home/phyton/nakawe/.agents/skills — MISS
+- /var/home/phyton/nakawe/.atl/skills — MISS
+
+### Project convention files
+- AGENTS.md: not found (uses ~/.config/opencode/AGENTS.md)
+- .cursorrules: not found
+- CLAUDE.md: not found
 
 ## Contract
 

@@ -1019,7 +1019,7 @@
               <div class="setting-toggle"><span class="label">Modo daltonismo</span><div class="toggle" id="dbToggle" onclick="nakawe.toggleDaltonism()"></div></div>
               <div class="setting-toggle"><span class="label">Alertas hápticas</span><div class="toggle on" onclick="nakawe.toggleHaptic(); this.classList.toggle('on')"></div></div>
               <div class="setting-toggle"><span class="label">Voz de LUZ activada</span><div class="toggle on" onclick="nakawe.toggleMute(); this.classList.toggle('on')"></div></div>
-              
+              <div class="setting-toggle"><span class="label">Idioma wixárika</span><div class="toggle" id="langToggle" onclick="nakawe.toggleLang()"></div></div>
             </div>
             <div class="pad" style="margin-top: 20px;">
               <button class="btn-secondary" onclick="nakawe.selectPatient(null); nakawe.navTo('login');" style="color: var(--danger); border-color: color-mix(in oklch, var(--danger) 30%, transparent);">Cambiar de paciente</button>
@@ -1091,13 +1091,47 @@
     const nakawe = {
       currentScreen:'login', activePatient:null, micListening:false, voiceModeActive:false, waitingForLuz:false,
       recognition:null, synth:window.speechSynthesis, muted:false, hapticOn:true, currentAudio:null,
-      scenario:'clinic', fontScale:1, highContrast:false, hcMode:null, daltonism:false,
+      scenario:'clinic', fontScale:1, highContrast:false, hcMode:null, daltonism:false, currentLang:'es',
       chatHistory:[], alertAnim:null,
       alertAudioMap:{
         'med-Paracetamol 500 mg': 'assets/audio/alerta-med-paracetamol.wav',
         'med-Ibuprofeno 400 mg': 'assets/audio/alerta-med-ibuprofeno.wav',
         'consulta-Consultorio 3': 'assets/audio/alerta-cons-consultorio3.wav',
         'consulta-Consultorio 7': 'assets/audio/alerta-cons-consultorio7.wav',
+      },
+      alertPhrases:{
+        es:{
+          med_subtitle:'Hora de tu medicamento',
+          consulta_subtitle:'Pasa al consultorio indicado',
+          dismiss_btn:'Entendido',
+          screen_title:'Alertas',
+          screen_subtitle:'Probá los distintos tipos de alerta',
+          test_med_btn:'Alerta de medicamento',
+          test_consulta_btn:'Alerta de consulta',
+          med_speech_tpl:'Es hora de tomar tu ',
+          consulta_speech_tpl:'Ya es tu turno de consulta, por favor pasa al ',
+        },
+        wx:{
+          med_subtitle:"Niuwá kwiepa mu'í níuríxi",
+          consulta_subtitle:"Múuyuwáme Consultorio kawa'úxixi",
+          dismiss_btn:'Níukwá',
+          screen_title:'Káayuhai-ka',
+          screen_subtitle:'Kíixi káaka muíriete káayuhai',
+          test_med_btn:'Káayuhai níuríxi-ka',
+          test_consulta_btn:'Káayuhai wiixika-ka',
+          speech:{
+            'med-Paracetamol 500 mg':"Niiwa mú-tiiwá-ka Paracetamol yu'utsuu xíika+tsi+ri miligramos.",
+            'med-Ibuprofeno 400 mg':'Yaaxeiya mí Ibuprofenu 400 mg kutuviika.',
+            'consulta-Consultorio 3':"Maniuki kwiepa, kwíe'eme xíixa Consultorio 3-yete.",
+            'consulta-Consultorio 7':"Maniuki kwiepa, kwíe'eme xíixa Consultorio 7-yete.",
+          }
+        }
+      },
+      alertAudioMapWx:{
+        'med-Paracetamol 500 mg':'assets/audio/alerta-med-paracetamol-wix.wav',
+        'med-Ibuprofeno 400 mg':'assets/audio/alerta-med-ibuprofeno-wix.wav',
+        'consulta-Consultorio 3':'assets/audio/alerta-cons-consultorio3-wix.wav',
+        'consulta-Consultorio 7':'assets/audio/alerta-cons-consultorio7-wix.wav',
       },
 
       initPatientSelector() {
@@ -1186,9 +1220,10 @@
           });
         }
         nameEl.textContent = data;
+        const phrases = this.alertPhrases[this.currentLang];
         subEl.textContent = type === 'med'
-          ? 'Hora de tu medicamento'
-          : 'Pasa al consultorio indicado';
+          ? phrases.med_subtitle
+          : phrases.consulta_subtitle;
         overlay.classList.add('active');
         this.triggerAlertHaptic();
         this.alertSpeak(type, data);
@@ -1205,7 +1240,8 @@
 
       alertSpeak(type, data) {
         const key = type + '-' + data;
-        const src = this.alertAudioMap[key];
+        const map = this.currentLang === 'wx' ? this.alertAudioMapWx : this.alertAudioMap;
+        const src = map[key];
         if (src) {
           const a = new Audio(src);
           a.volume = 1;
@@ -1221,9 +1257,13 @@
       _speakFallback(type, data) {
         if (!this.synth) return;
         this.synth.cancel();
-        const msg = type === 'med'
-          ? `Es hora de tomar tu ${data}`
-          : `Ya es tu turno de consulta, por favor pasa al ${data}`;
+        const phrases = this.alertPhrases[this.currentLang];
+        let msg;
+        if (this.currentLang === 'wx') {
+          msg = phrases.speech[type + '-' + data] || phrases.med_subtitle;
+        } else {
+          msg = (type === 'med' ? phrases.med_speech_tpl : phrases.consulta_speech_tpl) + data;
+        }
         const u = new SpeechSynthesisUtterance(msg);
         if (this.selectedVoice) { u.voice = this.selectedVoice; u.lang = this.selectedVoice.lang; }
         else { u.lang = 'es-MX'; }
@@ -1812,6 +1852,31 @@ ${alertStr ? '\nALERTAS:\n' + alertStr : ''}`;
         if(localStorage.getItem('nakaweDB')==='true'){ this.daltonism=true; scr.classList.add('db-active'); document.getElementById('dbToggle')?.classList.add('on'); }
         if(localStorage.getItem('nakaweHaptic')==='false'){ this.hapticOn=false; document.getElementById('btnHaptic')?.classList.remove('active'); document.getElementById('grpHaptic')?.classList.remove('active'); const t=document.querySelector('#screen-profile .setting-toggle:nth-of-type(4) .toggle'); if(t)t.classList.remove('on'); }
         if(localStorage.getItem('nakaweMuted')==='true'){ this.muted=true; document.getElementById('btnMute')?.classList.remove('active'); document.getElementById('grpMute')?.classList.remove('active'); const t=document.querySelector('#screen-profile .setting-toggle:nth-of-type(5) .toggle'); if(t)t.classList.remove('on'); }
+        const savedLang=localStorage.getItem('nakaweLang');
+        if(savedLang==='wx'){ this.currentLang='wx'; document.getElementById('langToggle')?.classList.add('on'); }
+        this.updateAlertLabels();
+      },
+      toggleLang() {
+        this.currentLang = this.currentLang === 'es' ? 'wx' : 'es';
+        localStorage.setItem('nakaweLang', this.currentLang);
+        document.getElementById('langToggle').classList.toggle('on', this.currentLang === 'wx');
+        this.updateAlertLabels();
+      },
+      updateAlertLabels() {
+        const phrases = this.alertPhrases[this.currentLang];
+        const dismissBtn = document.querySelector('.alert-btn');
+        if (dismissBtn) dismissBtn.textContent = phrases.dismiss_btn;
+        const screenTitle = document.querySelector('#screen-alerts h1');
+        if (screenTitle) screenTitle.textContent = phrases.screen_title;
+        const screenSub = document.querySelector('#screen-alerts .profile-head p');
+        if (screenSub) screenSub.textContent = phrases.screen_subtitle;
+        const btns = document.querySelectorAll('.alert-test-btn');
+        if (btns.length >= 4) {
+          btns[0].querySelector('strong').textContent = phrases.test_med_btn;
+          btns[1].querySelector('strong').textContent = phrases.test_med_btn;
+          btns[2].querySelector('strong').textContent = phrases.test_consulta_btn;
+          btns[3].querySelector('strong').textContent = phrases.test_consulta_btn;
+        }
       },
       escapeHtml(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
     };
