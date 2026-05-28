@@ -162,11 +162,10 @@
     .hc-active .context-card .med-icon svg { stroke: var(--accent) !important; }
     .hc-active .profile-row { border-top-color: var(--border) !important; }
     .hc-active .setting-toggle { border-top-color: var(--border) !important; }
-    .hc-active .voice-select { border-color: var(--border) !important; background: var(--surface) !important; color: var(--fg) !important; }
-    .hc-active .luz-header .ctrl-btn { border-color: var(--border) !important; }
+    .hc-active .tab { color: var(--muted) !important; }
     .hc-active .ctrl-label { color: var(--muted) !important; }
     .hc-active .ctrl-group.active .ctrl-label { color: var(--accent) !important; }
-    .hc-active .bubble.luz .bubble-header .luz-label { color: var(--accent) !important; }
+    .hc-active .luz-header .ctrl-btn { border-color: var(--border) !important; }
     .hc-active .tab { color: var(--muted) !important; }
     .hc-active .tab.active { color: var(--accent) !important; }
     .hc-active .status-icon.taken { background: var(--safe) !important; }
@@ -178,6 +177,21 @@
     .hc-active .triage-dot.green  { background: var(--safe) !important; }
     .hc-active .triage-dot.yellow { background: var(--warning) !important; }
     .hc-active .triage-dot.red    { background: var(--danger) !important; }
+
+    /* ─── Daltonism mode ─────────────────────────────────────── */
+    .db-active .status-icon { outline-offset: 2px; }
+    .db-active .status-icon.taken { outline: 2.5px solid var(--safe); background: color-mix(in oklch, var(--safe) 20%, transparent); }
+    .db-active .status-icon.pending { outline: 2.5px dashed var(--warning); background: color-mix(in oklch, var(--warning) 20%, transparent); }
+    .db-active .status-icon.missed { outline: 2.5px dotted var(--danger); background: color-mix(in oklch, var(--danger) 20%, transparent); }
+    .db-active .status-icon svg { stroke-width: 2.8; }
+    .db-active .status-icon.taken svg { stroke: var(--safe); }
+    .db-active .status-icon.pending svg { stroke: var(--warning); }
+    .db-active .status-icon.missed svg { stroke: var(--danger); }
+    /* HC+DB combined — border patterns still visible */
+    .hc-active.db-active .status-icon { outline-offset: 3px; }
+    .hc-active.db-active .status-icon.taken { outline-color: var(--fg); }
+    .hc-active.db-active .status-icon.pending { outline-color: var(--fg); outline-style: dashed; }
+    .hc-active.db-active .status-icon.missed { outline-color: var(--fg); outline-style: dotted; }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; overflow: hidden; }
@@ -600,11 +614,6 @@
     .hc-mode-selector { margin-top: 12px; display: none; flex-direction: column; gap: 8px; }
     .hc-mode-selector.visible { display: flex; }
     .hc-mode-selector .hc-label { font-family: var(--font-mono); font-size: calc(10px * var(--font-scale)); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-    .voice-select { font: inherit; font-size: calc(14px * var(--font-scale)); padding: 6px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--fg); max-width: 180px; cursor: pointer; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; padding-right: 28px; }
-    .voice-select:focus { outline: none; border-color: var(--accent); }
-    .voice-preview-btn { background: none; border: 1px solid var(--border); border-radius: 10px; padding: 6px 10px; cursor: pointer; color: var(--muted); font-size: 14px; display: flex; align-items: center; gap: 4px; margin-left: 6px; flex-shrink: 0; transition: border-color 0.2s, color 0.2s; }
-    .voice-preview-btn:active { transform: scale(0.95); }
-    .voice-preview-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .audio-dot { display: inline-block; margin-left: 8px; font-size: 14px; animation: audioPulse 1s ease-in-out infinite; vertical-align: middle; }
     @keyframes audioPulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
     .hc-active .audio-dot { filter: brightness(1.5) !important; }
@@ -840,47 +849,7 @@
               <h1>Medicamentos</h1>
               <button class="btn-ghost" style="font-size: calc(13px * var(--font-scale));" onclick="alert('Agregar medicamento')">+ Añadir</button>
             </div>
-            <section class="pad med-group" data-od-id="meds-today">
-              <p class="group-label">Hoy · 25 de mayo</p>
-              <div class="med-row">
-                <div class="med-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="m8.5 8.5 7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-                <div class="info"><div class="name">Paracetamol 500 mg</div><div class="schedule">8:00 AM · 2:00 PM · 8:00 PM · Cada 8h</div></div>
-                <span class="status-icon taken"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
-              </div>
-              <div class="med-row">
-                <div class="med-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="m8.5 8.5 7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-                <div class="info"><div class="name">Losartán 50 mg</div><div class="schedule">9:00 AM · Una vez al día</div></div>
-                <span class="status-icon taken"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
-              </div>
-              <div class="med-row">
-                <div class="med-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="m8.5 8.5 7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-                <div class="info"><div class="name">Omeprazol 20 mg</div><div class="schedule">7:00 AM · Antes del desayuno</div></div>
-                <span class="status-icon pending"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
-              </div>
-              <div class="med-row">
-                <div class="med-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="m8.5 8.5 7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-                <div class="info"><div class="name">Metformina 850 mg</div><div class="schedule">12:00 PM · Con la comida</div></div>
-                <span class="status-icon pending"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
-              </div>
-            </section>
-            <section class="pad med-group" data-od-id="meds-ayer">
-              <p class="group-label">Ayer · 24 de mayo</p>
-              <div class="med-row">
-                <div class="med-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="m8.5 8.5 7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-                <div class="info"><div class="name">Paracetamol 500 mg</div><div class="schedule">3 dosis · Completado</div></div>
-                <span class="status-icon taken"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
-              </div>
-              <div class="med-row">
-                <div class="med-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="m8.5 8.5 7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-                <div class="info"><div class="name">Losartán 50 mg</div><div class="schedule">1 dosis · Completado</div></div>
-                <span class="status-icon taken"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
-              </div>
-              <div class="med-row">
-                <div class="med-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="m8.5 8.5 7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-                <div class="info"><div class="name">Metformina 850 mg</div><div class="schedule">1 dosis · Sin tomar</div></div>
-                <span class="status-icon missed"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
-              </div>
-            </section>
+            <div id="medsContainer" class="pad"></div>
           </section>
 
           <section class="screen-view" id="screen-profile" data-od-id="profile">
@@ -899,7 +868,7 @@
             </div>
             <div class="profile-section" data-od-id="profile-settings">
               <p class="section-label">Accesibilidad</p>
-              <div class="setting-toggle"><span class="label">Texto más grande</span><div class="toggle" onclick="nakawe.toggleFontScale(); this.classList.toggle('on')"></div></div>
+              <div class="setting-toggle"><span class="label">Texto m&aacute;s grande</span><div class="toggle" onclick="nakawe.toggleFontScale()"></div></div>
               <div class="setting-toggle"><span class="label">Alto contraste</span><div class="toggle" id="hcToggle" onclick="nakawe.toggleHighContrast()"></div></div>
               <div class="hc-mode-selector" id="hcModeSelector">
                 <span class="hc-label">Elige un modo</span>
@@ -922,10 +891,10 @@
                   </div>
                 </div>
               </div>
-              <div class="setting-toggle"><span class="label">Modo daltonismo</span><div class="toggle" onclick="nakawe.toggleDaltonism(); this.classList.toggle('on')"></div></div>
+              <div class="setting-toggle"><span class="label">Modo daltonismo</span><div class="toggle" id="dbToggle" onclick="nakawe.toggleDaltonism()"></div></div>
               <div class="setting-toggle"><span class="label">Alertas hápticas</span><div class="toggle on" onclick="nakawe.toggleHaptic(); this.classList.toggle('on')"></div></div>
               <div class="setting-toggle"><span class="label">Voz de LUZ activada</span><div class="toggle on" onclick="nakawe.toggleMute(); this.classList.toggle('on')"></div></div>
-              <!-- voiceRow inyectado por JS en initVoices() -->
+              
             </div>
             <div class="pad" style="margin-top: 20px;">
               <button class="btn-secondary" onclick="nakawe.selectPatient(null); nakawe.navTo('login');" style="color: var(--danger); border-color: color-mix(in oklch, var(--danger) 30%, transparent);">Cambiar de paciente</button>
@@ -960,7 +929,6 @@
     const nakawe = {
       currentScreen:'login', activePatient:null, micListening:false, voiceModeActive:false, waitingForLuz:false,
       recognition:null, synth:window.speechSynthesis, muted:false, hapticOn:true, currentAudio:null,
-      voices:[], spanishVoices:[], selectedVoice:null, voiceReady:false,
       scenario:'clinic', fontScale:1, highContrast:false, hcMode:null, daltonism:false,
       chatHistory:[],
 
@@ -998,6 +966,7 @@
           b.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===(s==='main'?'main':s)));
         }
         if (s==='profile') this.updateProfileUI();
+        if (s==='meds') this.renderMeds();
         this.currentScreen=s; this.scrollChat();
       },
 
@@ -1532,76 +1501,19 @@ ${alertStr ? '\nALERTAS:\n' + alertStr : ''}`;
       },
 
       // ── Voz ──────────────────────────────────────────────────────────────
-      injectVoiceRow() {
-        const muteToggle = document.querySelector('#screen-profile .setting-toggle:last-of-type');
-        if (!muteToggle || document.getElementById('voiceRow')) return;
-        const row = document.createElement('div');
-        row.className = 'setting-toggle';
-        row.id = 'voiceRow';
-        row.innerHTML = `<span class="label">Voz</span>
-          <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
-            <select class="voice-select" id="voiceSelect"><option>Cargando…</option></select>
-            <button class="voice-preview-btn" id="voicePreviewBtn" aria-label="Probar voz" title="Probar voz">
-              <svg viewBox="0 0 24 24" width="16" height="16"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            </button>
-          </div>`;
-        muteToggle.parentNode.insertBefore(row, muteToggle.nextSibling);
-        document.getElementById('voicePreviewBtn').onclick = () => this.previewVoice();
-      },
-      initVoices() {
-        this.injectVoiceRow();
-        const populate = () => {
-          this.voices = this.synth?.getVoices() || [];
-          this.spanishVoices = this.voices.filter(v => v.lang && v.lang.startsWith('es'));
-          const sel = document.getElementById('voiceSelect');
-          if (!sel) return;
-          if (!this.spanishVoices.length) {
-            sel.innerHTML = '<option value="">Sin voz española</option>';
-            return;
-          }
-          sel.innerHTML = this.spanishVocesOptions();
-          // Auto‑seleccionar la mejor voz disponible
-          const saved = localStorage.getItem('nakaweVoiceURI');
-          const best = this.spanishVoices.find(v => v.voiceURI === saved)
-            || this.spanishVoices.find(v => /monica|paulina|juan|google/i.test(v.voiceURI))
-            || this.spanishVoices.find(v => /premium|natural|google/i.test(v.voiceURI))
-            || this.spanishVoices.find(v => v.lang === 'es-MX')
-            || this.spanishVoices[0];
-          sel.value = best?.voiceURI || '';
-          this.selectedVoice = best || null;
-          this.voiceReady = true;
-          // Conectar el onChange del select después de inyectarlo
-          sel.onchange = () => this.selectVoice(sel.value);
-        };
-        // Chrome carga voces asincrónicamente
-        if (this.synth?.getVoices().length) populate();
-        if (this.synth) this.synth.onvoiceschanged = populate;
-      },
-      spanishVocesOptions() {
-        return this.spanishVoices.map(v =>
-          `<option value="${v.voiceURI}">${v.name.replace(/^Microsoft /,'')} (${v.lang})</option>`
-        ).join('');
-      },
-      selectVoice(voiceURI) {
-        this.selectedVoice = this.voices.find(v => v.voiceURI === voiceURI) || null;
-        localStorage.setItem('nakaweVoiceURI', this.selectedVoice?.voiceURI || '');
-      },
-      previewVoice() {
-        if (!this.selectedVoice) { this.fallbackSpeak('No hay voz seleccionada'); return; }
-        this.fallbackSpeak('Hola, soy LUZ. ¿En qué puedo ayudarte?');
-      },
-      toggleMute() { this.muted=!this.muted; document.getElementById('btnMute').classList.toggle('active',!this.muted); document.getElementById('grpMute').classList.toggle('active',!this.muted); if(this.muted&&this.synth) this.synth.cancel(); if(this.muted&&this.currentAudio){ this.currentAudio.pause(); this.currentAudio=null; } },
-      toggleHaptic() { this.hapticOn=!this.hapticOn; document.getElementById('btnHaptic').classList.toggle('active',this.hapticOn); document.getElementById('grpHaptic').classList.toggle('active',this.hapticOn); const i=document.getElementById('hapticIndicator'); if(this.hapticOn){ i.classList.add('show'); setTimeout(()=>i.classList.remove('show'),1200); } },
+      toggleMute() { this.muted=!this.muted; document.getElementById('btnMute').classList.toggle('active',!this.muted); document.getElementById('grpMute').classList.toggle('active',!this.muted); if(this.muted&&this.synth) this.synth.cancel(); if(this.muted&&this.currentAudio){ this.currentAudio.pause(); this.currentAudio=null; } localStorage.setItem('nakaweMuted',this.muted); },
+      toggleHaptic() { this.hapticOn=!this.hapticOn; document.getElementById('btnHaptic').classList.toggle('active',this.hapticOn); document.getElementById('grpHaptic').classList.toggle('active',this.hapticOn); const i=document.getElementById('hapticIndicator'); if(this.hapticOn){ i.classList.add('show'); setTimeout(()=>i.classList.remove('show'),1200); } localStorage.setItem('nakaweHaptic',this.hapticOn); },
       triggerHaptic() { if(!this.hapticOn) return; const i=document.getElementById('hapticIndicator'); i.classList.add('show'); setTimeout(()=>i.classList.remove('show'),1000); if(navigator.vibrate) navigator.vibrate(30); },
-      toggleFontScale() { this.fontScale=this.fontScale===1?1.3:1; document.documentElement.style.setProperty('--font-scale',this.fontScale); },
+      toggleFontScale() { this.fontScale=this.fontScale===1?1.3:1; document.documentElement.style.setProperty('--font-scale',this.fontScale); localStorage.setItem('nakaweFS',this.fontScale); const t=document.querySelector('#screen-profile .setting-toggle:nth-of-type(1) .toggle'); if(t)t.classList.toggle('on',this.fontScale>1); },
       toggleHighContrast() {
-    this.highContrast=!this.highContrast;
-    const scr = document.getElementById('app');
-    scr.classList.toggle('hc-active',this.highContrast);
+        this.highContrast=!this.highContrast;
+        const scr = document.getElementById('app');
+        scr.classList.toggle('hc-active',this.highContrast);
         document.getElementById('hcToggle').classList.toggle('on',this.highContrast);
         document.getElementById('hcModeSelector').classList.toggle('visible',this.highContrast);
         if(this.highContrast && !this.hcMode) { this.setHighContrastMode(1); }
         if(!this.highContrast) { scr.classList.remove('hc-mode-1','hc-mode-2','hc-mode-3','hc-mode-4'); }
+        localStorage.setItem('nakaweHC',this.highContrast);
       },
       setHighContrastMode(m) {
         this.hcMode=m;
@@ -1609,9 +1521,62 @@ ${alertStr ? '\nALERTAS:\n' + alertStr : ''}`;
         scr.classList.remove('hc-mode-1','hc-mode-2','hc-mode-3','hc-mode-4');
         scr.classList.add('hc-mode-'+m);
         document.querySelectorAll('.hc-mode-chip').forEach(c=>c.classList.toggle('active',parseInt(c.dataset.hcMode)===m));
+        localStorage.setItem('nakaweHC',this.highContrast);
+        localStorage.setItem('nakaweHCMode',m);
         if(this.hapticOn) this.triggerHaptic();
       },
-      toggleDaltonism() { this.daltonism=!this.daltonism; document.querySelectorAll('.status-icon').forEach(e=>{ e.style.outline=e.style.outline||''; if(this.daltonism){ e.style.outline='2px solid var(--fg)'; e.style.outlineOffset='2px'; }else{ e.style.outline=''; e.style.outlineOffset=''; } }); },
+      toggleDaltonism() {
+        this.daltonism=!this.daltonism;
+        document.getElementById('app').classList.toggle('db-active',this.daltonism);
+        document.getElementById('dbToggle').classList.toggle('on',this.daltonism);
+        localStorage.setItem('nakaweDB',this.daltonism);
+      },
+      renderMeds() {
+        const c=document.getElementById('medsContainer');
+        if(!this.activePatient){ c.innerHTML='<p style="color:var(--muted);text-align:center;padding:40px 0;">Seleccion\u00e1 un paciente para ver sus medicamentos</p>'; return; }
+        const active=this.activePatient.medicamentos.filter(m=>m.activo!==false);
+        const suspended=this.activePatient.medicamentos.filter(m=>m.activo===false);
+        let html='';
+        if(active.length){
+          html+='<section class="med-group"><p class="group-label">Activos</p>';
+          active.forEach(m=>{html+=this.renderMedRow(m);});
+          html+='</section>';
+        }
+        if(suspended.length){
+          html+='<section class="med-group" style="opacity:0.65"><p class="group-label">Suspendidos</p>';
+          suspended.forEach(m=>{
+            let row=this.renderMedRow(m);
+            const info='Suspendido'+(m.suspendido?' \u00b7 '+this.escapeHtml(m.suspendido):'')+(m.motivoSuspension?' \u00b7 '+this.escapeHtml(m.motivoSuspension):'');
+            row=row.replace('</div></div>','<div class="schedule" style="color:var(--danger)">'+info+'</div></div></div>');
+            html+=row;
+          });
+          html+='</section>';
+        }
+        if(!active.length&&!suspended.length) html='<p style="color:var(--muted);text-align:center;padding:40px 0;">Sin medicamentos registrados</p>';
+        c.innerHTML=html;
+      },
+      renderMedRow(m) {
+        const sched=this.formatSchedule(m);
+        const status=m.activo!==false?'<span class="status-icon taken"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>':'<span class="status-icon" style="background:var(--muted)"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></span>';
+        return '<div class="med-row"><div class="med-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg></div><div class="info"><div class="name">'+this.escapeHtml(m.nombre)+'</div><div class="schedule">'+sched+'</div></div>'+status+'</div>';
+      },
+      formatSchedule(m) {
+        if(m.horario){
+          const disp=m.horario.replace(/\s*[yY]\s*/g,' \u00b7 ');
+          return this.escapeHtml(disp)+(m.frecuencia?' \u00b7 '+this.escapeHtml(m.frecuencia):'');
+        }
+        if(m.frecuencia&&m.frecuencia.toLowerCase().includes('prn')) return 'Seg\u00fan necesidad'+(m.indicaciones?' \u00b7 '+this.escapeHtml(m.indicaciones):'');
+        return this.escapeHtml(m.frecuencia||'Seg\u00fan necesidad');
+      },
+      restoreSettings() {
+        const scr=document.getElementById('app');
+        const fs=localStorage.getItem('nakaweFS');
+        if(fs){ this.fontScale=parseFloat(fs); document.documentElement.style.setProperty('--font-scale',this.fontScale); const t=document.querySelector('#screen-profile .setting-toggle:nth-of-type(1) .toggle'); if(t)t.classList.toggle('on',this.fontScale>1); }
+        if(localStorage.getItem('nakaweHC')==='true'){ this.highContrast=true; scr.classList.add('hc-active'); document.getElementById('hcToggle')?.classList.add('on'); const m=parseInt(localStorage.getItem('nakaweHCMode'))||1; this.setHighContrastMode(m); document.getElementById('hcModeSelector')?.classList.add('visible'); }
+        if(localStorage.getItem('nakaweDB')==='true'){ this.daltonism=true; scr.classList.add('db-active'); document.getElementById('dbToggle')?.classList.add('on'); }
+        if(localStorage.getItem('nakaweHaptic')==='false'){ this.hapticOn=false; document.getElementById('btnHaptic')?.classList.remove('active'); document.getElementById('grpHaptic')?.classList.remove('active'); const t=document.querySelector('#screen-profile .setting-toggle:nth-of-type(4) .toggle'); if(t)t.classList.remove('on'); }
+        if(localStorage.getItem('nakaweMuted')==='true'){ this.muted=true; document.getElementById('btnMute')?.classList.remove('active'); document.getElementById('grpMute')?.classList.remove('active'); const t=document.querySelector('#screen-profile .setting-toggle:nth-of-type(5) .toggle'); if(t)t.classList.remove('on'); }
+      },
       escapeHtml(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
     };
 
@@ -1619,9 +1584,9 @@ ${alertStr ? '\nALERTAS:\n' + alertStr : ''}`;
       nakawe.initPatientSelector();
       document.querySelectorAll('.scenario-toggle button').forEach(b=>b.addEventListener('click',()=>nakawe.setScenario(b.dataset.scenario)));
       nakawe.updateContextSummary();
-      nakawe.initVoices();
+      nakawe.restoreSettings();
       document.getElementById('msgInput').addEventListener('keydown',(e)=>{ if(e.key==='Enter'||e.keyCode===13) nakawe.sendMessage(); });
-});
+    });
 </script>
 <script>
   let deferredPrompt = null;
