@@ -383,19 +383,19 @@
     .tabbar {
       flex: 0 0 auto;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      padding: 8px 8px 0;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 6px 4px 0;
       border-top: 1px solid var(--border);
       background: color-mix(in oklch, var(--bg) 92%, transparent);
       backdrop-filter: blur(20px);
       transition: background 0.4s, border-color 0.4s;
     }
     .tab {
-      display: flex; flex-direction: column; align-items: center; gap: 2px;
-      padding: 8px 0;
+      display: flex; flex-direction: column; align-items: center; gap: 1px;
+      padding: 6px 0;
       color: var(--muted);
-      font-size: 10px;
-      letter-spacing: 0.02em;
+      font-size: 9px;
+      letter-spacing: 0.01em;
       cursor: pointer;
     }
     .tab.active { color: var(--accent); }
@@ -1738,8 +1738,8 @@ ${alertStr ? '\nALERTAS:\n' + alertStr : ''}`;
       // ── Voz ──────────────────────────────────────────────────────────────
       toggleMute() { this.muted=!this.muted; document.getElementById('btnMute').classList.toggle('active',!this.muted); document.getElementById('grpMute').classList.toggle('active',!this.muted); if(this.muted&&this.synth) this.synth.cancel(); if(this.muted&&this.currentAudio){ this.currentAudio.pause(); this.currentAudio=null; } localStorage.setItem('nakaweMuted',this.muted); },
       toggleHaptic() { this.hapticOn=!this.hapticOn; document.getElementById('btnHaptic').classList.toggle('active',this.hapticOn); document.getElementById('grpHaptic').classList.toggle('active',this.hapticOn); const i=document.getElementById('hapticIndicator'); if(this.hapticOn){ i.classList.add('show'); setTimeout(()=>i.classList.remove('show'),1200); } localStorage.setItem('nakaweHaptic',this.hapticOn); },
-      triggerHaptic() { if(!this.hapticOn) return; const i=document.getElementById('hapticIndicator'); i.classList.add('show'); setTimeout(()=>i.classList.remove('show'),1000); if(navigator.vibrate) navigator.vibrate(30); },
-      triggerAlertHaptic() { if(!this.hapticOn) return; const i=document.getElementById('hapticIndicator'); i.textContent='🔔 Alerta'; i.classList.add('show'); setTimeout(()=>{ i.classList.remove('show'); i.textContent='Vibración'; },2000); if(navigator.vibrate) navigator.vibrate([100,80,100,80,200]); },
+      triggerHaptic() { if(!this.hapticOn) return; const i=document.getElementById('hapticIndicator'); i.classList.add('show'); setTimeout(()=>i.classList.remove('show'),1000); if(navigator.vibrate) navigator.vibrate([150,80,150]); },
+      triggerAlertHaptic() { if(!this.hapticOn) return; const i=document.getElementById('hapticIndicator'); i.textContent='🔔 Alerta'; i.classList.add('show'); setTimeout(()=>{ i.classList.remove('show'); i.textContent='Vibración'; },2000); if(navigator.vibrate) navigator.vibrate([300,120,300,120,500]); },
       toggleFontScale() { this.fontScale=this.fontScale===1?1.3:1; document.documentElement.style.setProperty('--font-scale',this.fontScale); localStorage.setItem('nakaweFS',this.fontScale); const t=document.querySelector('#screen-profile .setting-toggle:nth-of-type(1) .toggle'); if(t)t.classList.toggle('on',this.fontScale>1); },
       toggleHighContrast() {
         this.highContrast=!this.highContrast;
