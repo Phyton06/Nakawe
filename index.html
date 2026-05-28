@@ -15,6 +15,7 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <link rel="manifest" href="manifest.json" />
   <title>Nakawe v4</title>
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
   <style>
     :root {
       --bg:      oklch(97% 0.018 70);
@@ -728,13 +729,12 @@
       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     }
     @keyframes alertBoxIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-    .alert-box .alert-svg {
+    .alert-box .alert-lottie {
       width: 100%;
       max-width: 260px;
       margin: 0 auto 8px;
       aspect-ratio: 1 / 1;
     }
-    .alert-box .alert-svg img { width: 100%; height: 100%; }
     .alert-box .alert-name {
       font-family: var(--font-display);
       font-size: calc(28px * var(--font-scale));
@@ -1054,7 +1054,7 @@
 
         <div class="alert-overlay" id="alertOverlay">
           <div class="alert-box" id="alertBox">
-            <div class="alert-svg" id="alertSvg"></div>
+            <div class="alert-lottie" id="alertLottie"></div>
             <div class="alert-name" id="alertName"></div>
             <div class="alert-sub" id="alertSub"></div>
             <button class="alert-btn" onclick="nakawe.closeAlert()">Entendido</button>
@@ -1092,7 +1092,7 @@
       currentScreen:'login', activePatient:null, micListening:false, voiceModeActive:false, waitingForLuz:false,
       recognition:null, synth:window.speechSynthesis, muted:false, hapticOn:true, currentAudio:null,
       scenario:'clinic', fontScale:1, highContrast:false, hcMode:null, daltonism:false,
-      chatHistory:[],
+      chatHistory:[], alertAnim:null,
 
       initPatientSelector() {
         document.getElementById('patientGrid').innerHTML = PACIENTES.map(p =>
@@ -1158,26 +1158,37 @@
         if(this.hapticOn) this.triggerHaptic();
       },
 
-      /* ─── Alert SVGs ────────────────────────── */
-      alertSVGs: {
-        med: 'assets/images/medicamento.svg',
-        consulta: 'assets/images/consulta.svg'
+      /* ─── Alert Lottie ──────────────────────── */
+      alertLottie: {
+        med: 'assets/images/medicina.json',
+        consulta: 'assets/images/consulta.json'
       },
 
       showAlert(type, data) {
         const overlay = document.getElementById('alertOverlay');
         const box = document.getElementById('alertBox');
-        const svgEl = document.getElementById('alertSvg');
+        const lottieEl = document.getElementById('alertLottie');
         const nameEl = document.getElementById('alertName');
         const subEl = document.getElementById('alertSub');
         box.className = 'alert-box type-' + type;
-        svgEl.innerHTML = '<img src="' + (this.alertSVGs[type] || '') + '" alt="">';
-        nameEl.textContent = data;
-        if (type === 'med') {
-          subEl.textContent = 'Es hora de tu medicamento';
-        } else {
-          subEl.textContent = 'Pasá al consultorio indicado';
+        // Destroy previous animation
+        if (this.alertAnim) { this.alertAnim.destroy(); this.alertAnim = null; }
+        lottieEl.innerHTML = '';
+        // Load new animation
+        const path = this.alertLottie[type];
+        if (path && typeof lottie !== 'undefined') {
+          this.alertAnim = lottie.loadAnimation({
+            container: lottieEl,
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: path
+          });
         }
+        nameEl.textContent = data;
+        subEl.textContent = type === 'med'
+          ? 'Es hora de tu medicamento'
+          : 'Pasá al consultorio indicado';
         overlay.classList.add('active');
         this.triggerAlertHaptic();
         this.alertSpeak(type, data);
@@ -1185,6 +1196,7 @@
 
       closeAlert() {
         document.getElementById('alertOverlay').classList.remove('active');
+        if (this.alertAnim) { this.alertAnim.destroy(); this.alertAnim = null; }
       },
 
       testAlert(type, data) {
