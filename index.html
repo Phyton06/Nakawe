@@ -1049,13 +1049,6 @@
                 <span class="atb-text"><strong>Alerta de consulta</strong><span class="atb-sub">Consultorio 7</span></span>
               </button>
             </div>
-            <div class="pad" style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px;">
-              <button class="btn-secondary" id="btnGenAudios" onclick="nakawe.generateAlertAudios()" style="width:100%;">
-                🔊 Generar audios de alerta (una vez)
-              </button>
-              <p style="color:var(--muted);font-size:calc(12px * var(--font-scale));margin:8px 0 0;text-align:center;">Usa Gemini TTS para crear los WAV. Consume tokens una sola vez.</p>
-              <div id="genAudioStatus" style="margin-top:8px;font-size:calc(13px * var(--font-scale));color:var(--muted);text-align:center;"></div>
-            </div>
           </section>
         </main>
 
@@ -1236,81 +1229,6 @@
         else { u.lang = 'es-MX'; }
         u.rate = 0.85;
         this.synth.speak(u);
-      },
-
-      generateAlertAudios() {
-        const messages = [
-          { text: 'Es hora de tomar tu Paracetamol 500 mg', key: 'med-Paracetamol 500 mg', file: 'alerta-med-paracetamol.wav' },
-          { text: 'Es hora de tomar tu Ibuprofeno 400 mg', key: 'med-Ibuprofeno 400 mg', file: 'alerta-med-ibuprofeno.wav' },
-          { text: 'Ya es tu turno de consulta, por favor pasa al Consultorio 3', key: 'consulta-Consultorio 3', file: 'alerta-cons-consultorio3.wav' },
-          { text: 'Ya es tu turno de consulta, por favor pasa al Consultorio 7', key: 'consulta-Consultorio 7', file: 'alerta-cons-consultorio7.wav' },
-        ];
-        const statusEl = document.getElementById('genAudioStatus');
-        const btn = document.getElementById('btnGenAudios');
-        btn.disabled = true;
-        let idx = 0;
-        const next = () => {
-          if (idx >= messages.length) {
-            statusEl.textContent = '✅ Todos los audios generados. Guardalos en assets/audio/';
-            btn.disabled = false;
-            return;
-          }
-          const m = messages[idx];
-          statusEl.textContent = `⏳ Generando ${idx+1}/${messages.length}: ${m.file}...`;
-          this._genOneAudio(m.text, m.file, () => {
-            idx++;
-            next();
-          });
-        };
-        next();
-      },
-
-      _genOneAudio(text, filename, done) {
-        if (typeof GEMINI_API_KEY === 'undefined' || GEMINI_API_KEY === 'tu-api-key-de-gemini') {
-          document.getElementById('genAudioStatus').textContent = '❌ No hay API key configurada';
-          return;
-        }
-        fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${GEMINI_API_KEY}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text }] }],
-              generationConfig: {
-                responseModalities: ['AUDIO'],
-                speechConfig: {
-                  voiceConfig: {
-                    prebuiltVoiceConfig: { voiceName: 'Vindemiatrix' }
-                  }
-                }
-              }
-            })
-          }
-        )
-        .then(r => r.json())
-        .then(data => {
-          const part = data.candidates?.[0]?.content?.parts?.[0];
-          if (part?.inlineData?.data) {
-            const pcm = this.base64ToBytes(part.inlineData.data);
-            const wav = this.pcmToWav(pcm, 24000);
-            const blob = new Blob([wav], { type: 'audio/wav' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            setTimeout(() => URL.revokeObjectURL(url), 5000);
-            done();
-          } else {
-            document.getElementById('genAudioStatus').textContent = `❌ Error generando ${filename}: sin audio en respuesta`;
-          }
-        })
-        .catch(err => {
-          document.getElementById('genAudioStatus').textContent = `❌ Error: ${err.message}`;
-        });
       },
 
       toggleMic() {
