@@ -220,6 +220,9 @@
       width: 100%;
     }
     .vital-field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+    .vital-field input.ok {
+      border-color: var(--safe); box-shadow: 0 0 0 2px var(--safe-soft);
+    }
     .vital-field input.warning {
       border-color: var(--warning); box-shadow: 0 0 0 2px var(--warning-soft);
     }
@@ -233,6 +236,7 @@
     }
     .vital-field .v-alert.visible { display: flex; }
     .vital-field .v-alert svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; flex-shrink: 0; }
+    .vital-field .v-alert.ok { color: var(--safe); }
     .vital-field .v-alert.warning { color: oklch(45% 0.18 85); }
     .vital-field .v-alert.danger { color: var(--danger); }
 
@@ -659,27 +663,43 @@
           alert.classList.remove('visible');
           return;
         }
-        const status = valInRange(val, range);
-        if (status === null) {
+        const parsed = valInRange(val, range);
+        if (parsed === null) {
           inp.className = '';
           alert.classList.remove('visible');
           return;
         }
-        if (status) {
-          inp.className = '';
-          alert.classList.remove('visible');
+        if (parsed === true) {
+          inp.className = 'ok';
+          alert.className = 'v-alert ok visible';
+          alert.querySelector('span').textContent = 'Rango normal';
+          return;
+        }
+        // Fuera de rango — determinar dirección
+        const direction = this._rangeDirection(val, range.warn);
+        const text = `${direction} (${range.warn.min}-${range.warn.max})`;
+        const dangerRange = range.danger || { min: -Infinity, max: Infinity };
+        const isDanger = valInRange(val, dangerRange);
+        if (!isDanger) {
+          inp.className = 'danger';
+          alert.className = 'v-alert danger visible';
         } else {
           inp.className = 'warning';
-          const isDanger = valInRange(val, range.danger ? range.danger : { min: -Infinity, max: Infinity });
-          if (!isDanger) {
-            inp.className = 'danger';
-            alert.className = 'v-alert danger visible';
-          } else {
-            alert.className = 'v-alert warning visible';
-          }
-          const label = inp.placeholder || '';
-          alert.querySelector('span').textContent = `Fuera de rango normal (${range.warn.min}-${range.warn.max})`;
+          alert.className = 'v-alert warning visible';
         }
+        alert.querySelector('span').textContent = text;
+      },
+      _rangeDirection(val, warn) {
+        if (typeof warn.min === 'string' && typeof warn.max === 'string') {
+          const v = parsePA(val);
+          if (!v) return 'Fuera de rango';
+          const min = parsePA(warn.min);
+          if (v.sys < min.sys || v.dia < min.dia) return 'Bajo';
+          return 'Elevado';
+        }
+        const n = parseFloat(val);
+        if (isNaN(n)) return 'Fuera de rango';
+        return n < warn.min ? 'Bajo' : 'Elevado';
       },
 
       setPriority(level) {
