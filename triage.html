@@ -663,7 +663,7 @@
           alert.classList.remove('visible');
           return;
         }
-        const parsed = valInRange(val, range);
+        const parsed = valInRange(val, range.warn);
         if (parsed === null) {
           inp.className = '';
           alert.classList.remove('visible');
