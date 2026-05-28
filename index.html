@@ -1184,24 +1184,18 @@
         const nameEl = document.getElementById('alertName');
         const subEl = document.getElementById('alertSub');
         box.className = 'alert-box type-' + type;
-        // Destroy previous animation
         if (this.alertAnim) { this.alertAnim.destroy(); this.alertAnim = null; }
         lottieEl.innerHTML = '';
-        // Load new animation
         const path = this.alertLottie[type];
         if (path && typeof lottie !== 'undefined') {
           this.alertAnim = lottie.loadAnimation({
-            container: lottieEl,
-            renderer: 'svg',
-            loop: true,
-            autoplay: true,
-            path: path
+            container: lottieEl, renderer: 'svg', loop: true, autoplay: true, path: path
           });
         }
         nameEl.textContent = data;
         subEl.textContent = type === 'med'
-          ? 'Es hora de tu medicamento'
-          : 'Pasá al consultorio indicado';
+          ? 'Hora de tu medicamento'
+          : 'Pasa al consultorio indicado';
         overlay.classList.add('active');
         this.triggerAlertHaptic();
         this.alertSpeak(type, data);
@@ -1236,7 +1230,7 @@
         this.synth.cancel();
         const msg = type === 'med'
           ? `Es hora de tomar tu ${data}`
-          : `Ya es tu turno de consulta, por favor pasá al ${data}`;
+          : `Ya es tu turno de consulta, por favor pasa al ${data}`;
         const u = new SpeechSynthesisUtterance(msg);
         if (this.selectedVoice) { u.voice = this.selectedVoice; u.lang = this.selectedVoice.lang; }
         else { u.lang = 'es-MX'; }
@@ -1248,8 +1242,8 @@
         const messages = [
           { text: 'Es hora de tomar tu Paracetamol 500 mg', key: 'med-Paracetamol 500 mg', file: 'alerta-med-paracetamol.wav' },
           { text: 'Es hora de tomar tu Ibuprofeno 400 mg', key: 'med-Ibuprofeno 400 mg', file: 'alerta-med-ibuprofeno.wav' },
-          { text: 'Ya es tu turno de consulta, por favor pasá al Consultorio 3', key: 'consulta-Consultorio 3', file: 'alerta-cons-consultorio3.wav' },
-          { text: 'Ya es tu turno de consulta, por favor pasá al Consultorio 7', key: 'consulta-Consultorio 7', file: 'alerta-cons-consultorio7.wav' },
+          { text: 'Ya es tu turno de consulta, por favor pasa al Consultorio 3', key: 'consulta-Consultorio 3', file: 'alerta-cons-consultorio3.wav' },
+          { text: 'Ya es tu turno de consulta, por favor pasa al Consultorio 7', key: 'consulta-Consultorio 7', file: 'alerta-cons-consultorio7.wav' },
         ];
         const statusEl = document.getElementById('genAudioStatus');
         const btn = document.getElementById('btnGenAudios');
