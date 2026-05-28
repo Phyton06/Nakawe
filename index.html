@@ -705,6 +705,124 @@
     .voice-end-call button svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; }
 
     .fade-in  { animation: fadeIn 0.35s ease-out both; }
+
+    /* ─── Alert Overlay ───────────────────────────────── */
+    .alert-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .alert-overlay.active { display: flex; animation: alertIn 0.35s ease-out both; }
+    @keyframes alertIn { from { opacity: 0; } to { opacity: 1; } }
+    .alert-box {
+      background: var(--surface);
+      border-radius: 28px;
+      padding: 40px 32px 28px;
+      max-width: 380px;
+      width: 100%;
+      text-align: center;
+      animation: alertBoxIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    @keyframes alertBoxIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .alert-box .alert-svg {
+      width: 180px; height: 180px;
+      margin: 0 auto 8px;
+    }
+    .alert-box .alert-svg svg { width: 100%; height: 100%; }
+    .alert-box .alert-name {
+      font-family: var(--font-display);
+      font-size: calc(28px * var(--font-scale));
+      font-weight: 700;
+      line-height: 1.2;
+      margin: 12px 0 4px;
+    }
+    .alert-box .alert-sub {
+      color: var(--muted);
+      font-size: calc(15px * var(--font-scale));
+      margin: 0 0 24px;
+    }
+    .alert-box .alert-btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-size: calc(17px * var(--font-scale));
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .alert-box .alert-btn:active { transform: scale(0.96); }
+    .alert-box.type-consulta .alert-name { color: var(--safe); }
+    .alert-box.type-med .alert-name { color: var(--accent); }
+    .hc-active .alert-overlay { background: rgba(0,0,0,0.85); }
+    .hc-active .alert-box { border: 2px solid var(--border); }
+    .hc-active .alert-box .alert-btn { border: 2px solid var(--fg); background: var(--bg); color: var(--fg); }
+
+    .alert-test-btn {
+      display: flex; align-items: center; gap: 14px;
+      width: 100%; padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface);
+      color: var(--fg);
+      font: inherit;
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .alert-test-btn:active { transform: scale(0.98); border-color: var(--accent); }
+    .alert-test-btn .atb-icon { font-size: 28px; flex-shrink: 0; }
+    .alert-test-btn .atb-text { display: flex; flex-direction: column; gap: 2px; }
+    .alert-test-btn .atb-text strong { font-size: calc(16px * var(--font-scale)); }
+    .alert-test-btn .atb-sub { font-size: calc(13px * var(--font-scale)); color: var(--muted); }
+
+    /* ─── Alert SVGs ──────────────────────────────────── */
+    /* Pill bounce */
+    @keyframes pillBounce {
+      0%   { transform: translateY(-40px) rotate(-10deg); opacity: 0; }
+      40%  { transform: translateY(6px) rotate(3deg); opacity: 1; }
+      60%  { transform: translateY(-4px) rotate(-2deg); }
+      80%  { transform: translateY(2px) rotate(1deg); }
+      100% { transform: translateY(0) rotate(0deg); }
+    }
+    .pill-body {
+      animation: pillBounce 0.8s cubic-bezier(0.34,1.56,0.64,1) both;
+      transform-origin: center;
+    }
+    @keyframes pillGlow {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.8; }
+    }
+    .pill-glow {
+      animation: pillGlow 2s ease-in-out infinite;
+    }
+
+    /* Door open */
+    @keyframes doorSwing {
+      0%   { transform: perspective(400px) rotateY(0deg); }
+      100% { transform: perspective(400px) rotateY(-65deg); }
+    }
+    .door-panel {
+      animation: doorSwing 1s ease-in-out 0.3s both;
+      transform-origin: left center;
+      transform-style: preserve-3d;
+    }
+    @keyframes personWalk {
+      0%   { transform: translateX(-40px); opacity: 0; }
+      50%  { opacity: 1; }
+      100% { transform: translateX(10px); opacity: 1; }
+    }
+    .door-person {
+      animation: personWalk 1s ease-out 0.6s both;
+    }
     .slide-up { animation: slideUp 0.35s ease-out both; }
     @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
@@ -804,7 +922,7 @@
                   </div>
                   <div class="scenario-content" data-scenario="home" style="display:none">
                     <div class="row-between">
-                      <span class="status-tag home">Post‑consulta</span>
+                      <span class="status-tag home">Próximo medicamento</span>
                       <span class="meta">Próxima cita: 12 jun</span>
                     </div>
                     <div class="next-action">
@@ -944,7 +1062,41 @@
               <button class="btn-secondary" onclick="nakawe.selectPatient(null); nakawe.navTo('login');" style="color: var(--danger); border-color: color-mix(in oklch, var(--danger) 30%, transparent);">Cambiar de paciente</button>
             </div>
           </section>
+
+          <section class="screen-view" id="screen-alerts" data-od-id="alerts">
+            <div class="profile-head" data-od-id="alerts-head">
+              <h1 style="margin:0;">Alertas</h1>
+              <p style="color: var(--muted); font-size: calc(14px * var(--font-scale)); margin: 0;">Probá los distintos tipos de alerta</p>
+            </div>
+            <div class="pad" style="display:flex;flex-direction:column;gap:12px;margin-top:8px;">
+              <button class="alert-test-btn" onclick="nakawe.testAlert('med','Paracetamol 500 mg')">
+                <span class="atb-icon">💊</span>
+                <span class="atb-text"><strong>Alerta de medicamento</strong><span class="atb-sub">Paracetamol 500 mg</span></span>
+              </button>
+              <button class="alert-test-btn" onclick="nakawe.testAlert('med','Ibuprofeno 400 mg')">
+                <span class="atb-icon">💊</span>
+                <span class="atb-text"><strong>Alerta de medicamento</strong><span class="atb-sub">Ibuprofeno 400 mg</span></span>
+              </button>
+              <button class="alert-test-btn" onclick="nakawe.testAlert('consulta','Consultorio 3')">
+                <span class="atb-icon">🚪</span>
+                <span class="atb-text"><strong>Alerta de consulta</strong><span class="atb-sub">Consultorio 3</span></span>
+              </button>
+              <button class="alert-test-btn" onclick="nakawe.testAlert('consulta','Consultorio 7')">
+                <span class="atb-icon">🚪</span>
+                <span class="atb-text"><strong>Alerta de consulta</strong><span class="atb-sub">Consultorio 7</span></span>
+              </button>
+            </div>
+          </section>
         </main>
+
+        <div class="alert-overlay" id="alertOverlay">
+          <div class="alert-box" id="alertBox">
+            <div class="alert-svg" id="alertSvg"></div>
+            <div class="alert-name" id="alertName"></div>
+            <div class="alert-sub" id="alertSub"></div>
+            <button class="alert-btn" onclick="nakawe.closeAlert()">Entendido</button>
+          </div>
+        </div>
 
         <nav class="tabbar" id="tabbar" style="display:none" data-od-id="tabbar">
           <div class="tab active" data-tab="main" onclick="nakawe.navTo('main')">
@@ -952,6 +1104,9 @@
           </div>
           <div class="tab" data-tab="meds" onclick="nakawe.navTo('meds')">
             <svg viewBox="0 0 24 24"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg> Medicinas
+          </div>
+          <div class="tab" data-tab="alerts" onclick="nakawe.navTo('alerts')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> Alertas
           </div>
           <div class="tab" data-tab="profile" onclick="nakawe.navTo('profile')">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg> Perfil
@@ -1022,7 +1177,7 @@
       updateContextSummary() {
         const d = document.getElementById('ctxDot'), l = document.getElementById('ctxLabel'), v = document.getElementById('ctxValue');
         if (this.scenario==='clinic') { d.className='status-dot-mini triage-dot green'; l.textContent='Consulta general'; v.textContent='Turno #042 · 15 min'; }
-        else { d.className='status-dot-mini triage-dot yellow'; l.textContent='Post‑consulta'; v.textContent='Paracetamol 8:00 PM'; }
+        else { d.className='status-dot-mini triage-dot yellow'; l.textContent='Próximo medicamento'; v.textContent='Paracetamol 8:00 PM'; }
       },
 
       setScenario(s) {
@@ -1038,6 +1193,78 @@
         this.addChat('luz','¡Bien hecho! Anotado: Paracetamol 500 mg a las '+new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})+'.');
         if(!this.muted) this.fallbackSpeak('Bien hecho. Anotado tu medicamento.');
         if(this.hapticOn) this.triggerHaptic();
+      },
+
+      /* ─── Alert SVGs ────────────────────────── */
+      alertSVGs: {
+        med: `<svg viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="pillGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--accent)"/>
+      <stop offset="100%" stop-color="oklch(from var(--accent) l c h / 0.7)"/>
+    </linearGradient>
+  </defs>
+  <!-- glow -->
+  <ellipse class="pill-glow" cx="90" cy="150" rx="40" ry="8" fill="var(--accent)" opacity="0.3"/>
+  <!-- pill -->
+  <g class="pill-body">
+    <rect x="55" y="25" width="70" height="100" rx="35" fill="url(#pillGrad)" stroke="var(--fg)" stroke-width="2"/>
+    <rect x="55" y="25" width="70" height="50" rx="20" fill="var(--bg)" opacity="0.15"/>
+    <!-- highlight -->
+    <rect x="72" y="50" width="10" height="70" rx="5" fill="var(--bg)" opacity="0.15"/>
+  </g>
+  <!-- sparkles -->
+  <g class="pill-glow">
+    <circle cx="30" cy="45" r="4" fill="var(--accent)"/>
+    <circle cx="150" cy="65" r="3" fill="var(--accent)"/>
+    <circle cx="140" cy="130" r="5" fill="var(--accent)"/>
+    <circle cx="35" cy="120" r="3" fill="var(--accent)"/>
+  </g>
+</svg>`,
+        consulta: `<svg viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- door frame -->
+  <rect x="35" y="20" width="110" height="145" rx="4" stroke="var(--fg)" stroke-width="3" fill="none"/>
+  <rect x="35" y="20" width="110" height="10" rx="4" fill="var(--fg)"/>
+  <!-- door panel -->
+  <g class="door-panel">
+    <rect x="40" y="30" width="100" height="130" rx="2" fill="var(--surface)" stroke="var(--fg)" stroke-width="2"/>
+    <rect x="120" y="80" width="8" height="8" rx="2" fill="var(--fg)"/>
+    <rect x="50" y="80" width="30" height="40" rx="4" fill="var(--fg)" opacity="0.1"/>
+  </g>
+  <!-- person walking in -->
+  <g class="door-person">
+    <circle cx="65" cy="80" r="12" fill="var(--accent)"/>
+    <path d="M65 95c-12 0-22 6-22 14v8h44v-8c0-8-10-14-22-14Z" fill="var(--accent)"/>
+  </g>
+  <!-- arrow -->
+  <path d="M145 90 l-12-8 v6 h-18 v4 h18 v6 z" fill="var(--safe)" opacity="0.6"/>
+</svg>`
+      },
+
+      showAlert(type, data) {
+        const overlay = document.getElementById('alertOverlay');
+        const box = document.getElementById('alertBox');
+        const svgEl = document.getElementById('alertSvg');
+        const nameEl = document.getElementById('alertName');
+        const subEl = document.getElementById('alertSub');
+        box.className = 'alert-box type-' + type;
+        svgEl.innerHTML = this.alertSVGs[type] || '';
+        nameEl.textContent = data;
+        if (type === 'med') {
+          subEl.textContent = 'Es hora de tu medicamento';
+        } else {
+          subEl.textContent = 'Pasá al consultorio indicado';
+        }
+        overlay.classList.add('active');
+        if (this.hapticOn) this.triggerHaptic();
+      },
+
+      closeAlert() {
+        document.getElementById('alertOverlay').classList.remove('active');
+      },
+
+      testAlert(type, data) {
+        this.showAlert(type, data);
       },
 
       toggleMic() {
@@ -1173,7 +1400,7 @@
       buildSystemPrompt() {
         const p = this.activePatient || PACIENTES[0];
         const scenario = this.scenario;
-        const s = scenario === 'clinic' ? 'En la clínica, esperando consulta' : 'En casa, después de la consulta';
+        const s = scenario === 'clinic' ? 'En la clínica, esperando consulta' : 'En casa, próximo medicamento';
 
         // Condiciones crónicas
         let condStr = '';
