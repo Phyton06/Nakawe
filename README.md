@@ -149,8 +149,8 @@ Sistema de salud digital para ExpoCiencias 2026. Los pacientes escanean un códi
 
 ## PWA
 
-Escaneá el código QR o abrí `https://phyton06.github.io/Nakawe/` desde tu celular.
-El navegador te va a ofrecer instalar la app en tu pantalla de inicio.
+Escanea el código QR o abre `https://phyton06.github.io/Nakawe/` desde tu celular.
+El navegador te ofrecerá instalar la app en tu pantalla de inicio.
 
 ## Stack (Prototipo)
 
