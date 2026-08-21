@@ -2,7 +2,7 @@
 
 > **⚠️ ExpoCiencias 2026 Prototype** — This was a rapid prototype (48–72 hours) built for ExpoCiencias 2026. For production, the architecture would be fundamentally different — see [Production Vision](#production-vision) below.
 
-Digital health system for ExpoCiencias 2026. Patients scan a QR code, open the PWA on their phone, and interact with **LUZ**, the conversational health assistant.
+Digital health system for ExpoCiencias 2026. Patients open the PWA on their phone and interact with **LUZ**, the conversational health assistant.
 
 ## Screenshots
 
@@ -31,8 +31,7 @@ Digital health system for ExpoCiencias 2026. Patients scan a QR code, open the P
 
 ## PWA
 
-Scan the QR code or open `https://phyton06.github.io/Nakawe/` from your phone.
-The browser will offer to install the app on your home screen.
+Open the prototype from your phone: **[phyton06.github.io/Nakawe](https://phyton06.github.io/Nakawe/)**
 
 ## Stack (Prototype)
 
@@ -120,7 +119,7 @@ The absence of real-time visibility and proactive follow-up in clinics creates a
 
 > **⚠️ Prototipo ExpoCiencias 2026** — Este fue un prototipo rápido (48–72 horas) construido para ExpoCiencias 2026. Para producción, la arquitectura sería fundamentalmente diferente — ver [Visión de Producción](#visión-de-producción) más abajo.
 
-Sistema de salud digital para ExpoCiencias 2026. Los pacientes escanean un código QR, abren la PWA en su celular, e interactúan con **LUZ**, el asistente de salud conversacional.
+Sistema de salud digital para ExpoCiencias 2026. Los pacientes abren la PWA en su celular e interactúan con **LUZ**, el asistente de salud conversacional.
 
 ## Capturas
 
@@ -149,8 +148,7 @@ Sistema de salud digital para ExpoCiencias 2026. Los pacientes escanean un códi
 
 ## PWA
 
-Escanea el código QR o abre `https://phyton06.github.io/Nakawe/` desde tu celular.
-El navegador te ofrecerá instalar la app en tu pantalla de inicio.
+Abre el prototipo desde tu celular: **[phyton06.github.io/Nakawe](https://phyton06.github.io/Nakawe/)**
 
 ## Stack (Prototipo)
 
