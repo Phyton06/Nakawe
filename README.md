@@ -2,6 +2,8 @@
 
 > **⚠️ ExpoCiencias 2026 Prototype** — This was a rapid prototype (48–72 hours) built for ExpoCiencias 2026. For production, the architecture would be fundamentally different — see [Production Vision](#production-vision) below.
 
+> **🔒 Synthetic Data** — This demo uses entirely fictional patient data. No real patient information is stored, processed, or transmitted. All names, medical histories, and clinical details are illustrative only.
+
 Digital health system for ExpoCiencias 2026. Patients open the PWA on their phone and interact with **LUZ**, the conversational health assistant.
 
 ## Screenshots
@@ -118,6 +120,8 @@ The absence of real-time visibility and proactive follow-up in clinics creates a
 # Nakawe — Asistente de Salud Digital
 
 > **⚠️ Prototipo ExpoCiencias 2026** — Este fue un prototipo rápido (48–72 horas) construido para ExpoCiencias 2026. Para producción, la arquitectura sería fundamentalmente diferente — ver [Visión de Producción](#visión-de-producción) más abajo.
+
+> **🔒 Datos Sintéticos** — Esta demostración utiliza datos de pacientes completamente ficticios. No se almacena, procesa ni transmite información real de pacientes. Todos los nombres, historiales médicos y detalles clínicos son únicamente ilustrativos.
 
 Sistema de salud digital para ExpoCiencias 2026. Los pacientes abren la PWA en su celular e interactúan con **LUZ**, el asistente de salud conversacional.
 
