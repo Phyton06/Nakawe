@@ -4,6 +4,10 @@
 
 > **🔒 Synthetic Data** — This demo uses entirely fictional patient data. No real patient information is stored, processed, or transmitted. All names, medical histories, and clinical details are illustrative only.
 
+## Testing
+
+Manual demo — no automated tests. The prototype validates the concept through live interaction at ExpoCiencias 2026. A production version would include end-to-end tests with Cypress or Playwright.
+
 Digital health system for ExpoCiencias 2026. Patients open the PWA on their phone and interact with **LUZ**, the conversational health assistant.
 
 ## Screenshots
