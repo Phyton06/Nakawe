@@ -74,8 +74,8 @@ The `Historial_pacientes.md` document contains full summaries for printing on ba
 | File | Purpose |
 |------|---------|
 | `js/pacientes.js` | Full profiles for all 4 patients (shared) |
-| `js/gemini-config.js` | Gemini API key (gitignored) |
-| `js/gemini-config.example.js` | Configuration template |
+| `js/gemini-config.js` | Gemini API key (gitignored, never committed) |
+| `js/gemini-config.example.js` | Configuration template — copy and add your key |
 | `Historial_pacientes.md` | Summaries for banner printing |
 
 ---
@@ -193,8 +193,8 @@ El documento `Historial_pacientes.md` contiene los resúmenes completos para imp
 | Archivo | Propósito |
 |---------|-----------|
 | `js/pacientes.js` | Perfiles completos de los 4 pacientes (compartido) |
-| `js/gemini-config.js` | API key de Gemini (gitignored) |
-| `js/gemini-config.example.js` | Template de configuración |
+| `js/gemini-config.js` | API key de Gemini (gitignored, nunca se sube) |
+| `js/gemini-config.example.js` | Template de configuración — copia y agrega tu key |
 | `Historial_pacientes.md` | Resúmenes para impresión en lonas |
 
 ---
